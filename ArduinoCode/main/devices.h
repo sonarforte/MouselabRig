@@ -7,6 +7,7 @@
 #define DEVICES_H_
 
 #define photoPin 2
+#define valvePin 3
 
 
 // Opens valve for ms milliseconds

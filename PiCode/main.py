@@ -7,44 +7,31 @@ import serial
 import time
 import threading
 
+received = 0
+numLaps = 0
+prevPhotoState = 0
 
 
-ser = serial.Serial()
+# Initialize serial communications
+ser = serial.Serial()	
 ser.baudrate = 9600
-portNo = 0
 
+# Identify valid serial port
+portNo = 0
 while True :
+	# Loops through serial ports until connection found
 	try :
-		print portNo
 		ser.port = '/dev/ttyACM' + str(portNo)
 		ser.open()
 		break
 
 	except serial.SerialException :
-
 		portNo += 1
-		print "portNo +=1 ", portNo
 
-	# if ser.port == '/dev/ttyACM0' :
-	# 	ser.port = '/dev/ttyACM1'
+	if portNo > 8 :
+		print "Please connect the Arduino"
+		break
 
-	# elif ser.port == '/dev/ttyACM1' :
-	# 	ser.port = '/dev/ttyACM2'
-
-	# elif ser.port == '/dev/ttyACM2' :
-	# 	ser.port = '/dev/ttyACM3'
-
-# ser = serial.Serial()
-# ser.baudrate = 9600
-# ser.port = '/dev/ttyACM0'
-
-print "down here"
-print ser.port
-print ser.isOpen()
-
-received = 0
-numLaps = 0
-prevPhotoState = 0
 
 
 while True :

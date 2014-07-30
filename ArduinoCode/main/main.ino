@@ -137,6 +137,7 @@ void setup()
 {
 
 	pinMode(photoPin, INPUT);			// open pin for reading input
+	pinMode(valvePin, OUTPUT);
 	Serial.begin(9600);					// initialize serial data stream
 
 }
@@ -145,7 +146,7 @@ void setup()
 // Main loop - Prints sensor data. Rinse and repeat
 void loop() 
 {
-
+	
 	int prevPhotoState = photoState();
 	delay(200);								
 	// !! REMOVE DELAY !!

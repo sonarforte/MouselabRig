@@ -8,7 +8,16 @@
 // Opens valve for ms milliseconds
 void valveOpen( int ms ) {
 
+	unsigned long startTime = millis();
+	digitalWrite(valvePin, HIGH);
 
+	while  (millis() - startTime < ms) {
+		
+		// Wait it out until ms time has passed 
+	
+	}
+	
+	digitalWrite(valvePin, LOW);
 
 }
 
