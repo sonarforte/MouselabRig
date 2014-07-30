@@ -73,11 +73,11 @@ void sendSensorData() {
 
 	if (cycleCheck(&lastCycleMillis, sensorCycle)) {
 		
-		Serial.print("DATA,");						// entry 1 - data header
-		Serial.print("milliseconds,");
+		Serial.print("ARD,");						// entry 1 - data header
+		Serial.print("MS,");
 		Serial.print(millis());						// entry 2 - number of ms since runtime
 		Serial.print(",");
-		Serial.print("photoState,");
+		Serial.print("PHOTO_STATE,");
 		Serial.print(photoState());					// entry 4 - state of photoPin
 		Serial.print(",");
 		Serial.print("\n");							// EOL

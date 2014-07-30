@@ -13,17 +13,17 @@ ser = serial.Serial()
 ser.baudrate = 9600
 portNo = 0
 
-try :
-	
-	print "try " + str(portNo)
-	ser.open()
+while True :
+	try :
+		print portNo
+		ser.port = '/dev/ttyACM' + str(portNo)
+		ser.open()
+		break
 
-except serial.SerialException :
+	except serial.SerialException :
 
-	portNo += 1
-	ser.port = '/dev/ttyACM' + str(portNo)
-	print "except" + str(portNo)
-	ser.open()
+		portNo += 1
+		print "portNo +=1 ", portNo
 
 	# if ser.port == '/dev/ttyACM0' :
 	# 	ser.port = '/dev/ttyACM1'
@@ -56,7 +56,7 @@ while True :
 		while ser.isOpen() :
 
 			# print "Pi: good connection"
-			# ser.write('DATA,VALVE_MS,500,\n')
+			# ser.write('RPI,VALVE_MS,500,\n')
 			# print "Pi: message sent"
 			# # time.sleep(5)
 			# # print "Pi: done sleeping"
@@ -66,7 +66,7 @@ while True :
 			# if ser.inWaiting > 0 :
 
 			# 	print "Ard: " + ser.readline()
-
+			# print "open for business"
 
 			if ser.inWaiting() :
 
@@ -78,15 +78,15 @@ while True :
 				print ardMsg
 
 				# Assign important values from Ard to their variables
-				if ardMsg.index('DATA') == 0 :  
+				if ardMsg.index('ARD') == 0 :  
 				
 					for i in range(1, len(ardMsg) - 1) : 
 
-						if ardMsg[i] == 'milliseconds' :
+						if ardMsg[i] == 'MS' :
 
 							millis = ardMsg[i + 1]
 
-						elif ardMsg[i] == 'photoState' :
+						elif ardMsg[i] == 'PHOTO_STATE' :
 
 							photoState = ardMsg[i + 1]
 
