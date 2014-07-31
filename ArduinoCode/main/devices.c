@@ -5,6 +5,8 @@
 
 #include "devices.h"
 
+
+// Can't import "HIGH"?
 // Opens valve for ms milliseconds
 void valveOpen( int ms ) {
 

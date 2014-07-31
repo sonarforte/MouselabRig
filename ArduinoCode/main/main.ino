@@ -147,6 +147,14 @@ void setup()
 void loop() 
 {
 	
+	// Test the relay...
+	// digitalWrite(valvePin, HIGH);
+	// delay(2000);
+	// digitalWrite(valvePin, LOW);
+	// delay(2000);
+
+
+
 	int prevPhotoState = photoState();
 	delay(200);								
 	// !! REMOVE DELAY !!
