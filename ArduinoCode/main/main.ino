@@ -7,6 +7,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <avr/interrupt.h>
+
 
 extern "C" {
 
@@ -136,9 +138,19 @@ boolean processPiData() {
 void setup() 
 {
 
+	// Configure pins
 	pinMode(photoPin, INPUT);			// open pin for reading input
-	pinMode(valvePin, OUTPUT);
+	pinMode(valvePin, OUTPUT);			// open pin attached to relay board
 	Serial.begin(9600);					// initialize serial data stream
+	
+	// Configure interrupts
+	sei();								// enable global interrupts
+	EIMSK |= (1 << INT0);				// enable external interrupt INT0 (I/O pin 2)
+	EICRA |= (1 << ISC00);				// trigger INT0 on any logical change
+
+
+
+
 
 }
 
@@ -155,14 +167,14 @@ void loop()
 
 
 
-	int prevPhotoState = photoState();
-	delay(200);								
-	// !! REMOVE DELAY !!
-	if (photoState() != prevPhotoState) {
+	// int prevPhotoState = photoState();
+	// delay(200);								
+	// // !! REMOVE DELAY !!
+	// if (photoState() != prevPhotoState) {
 
-		sendSensorData();
+	// 	sendSensorData();
 
-	}
+	// }
 
 
 	if (Serial.available() > 0) {
@@ -182,5 +194,14 @@ void loop()
 
 	}
 
+
+}
+
+// Deal with the interrupts
+
+// ISR for INT0 (photoPin) 
+ISR(INT0_vect) {
+
+	sendSensorData();
 
 }
