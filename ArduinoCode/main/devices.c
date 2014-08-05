@@ -8,6 +8,7 @@
 
 // Can't import "HIGH"?
 // Opens valve for ms milliseconds
+// Should use timer interrupt here or else Arduino does nothing useful while we're waiting
 void valveOpen( int ms ) {
 
 	unsigned long startTime = millis();
@@ -26,8 +27,7 @@ void valveOpen( int ms ) {
 // Returns state of photo sensor
 int photoState( void ) {
 
-	int currentState = digitalRead(photoPin);
-	return currentState;
+	return digitalRead(photoPin);
 
 }
 

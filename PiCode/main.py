@@ -32,7 +32,9 @@ while True :
 		print "Please connect the Arduino"
 		break
 
+print "goods"
 
+ser.flushInput()
 
 while True :
 
@@ -78,7 +80,9 @@ while True :
 							photoState = ardMsg[i + 1]
 
 
+					for i in range(0, len(ardMsg)) :
 
+						print "entry " + str(i) + " is " + str(ardMsg[i])
 					
 					print 'millis: ' + str(millis)
 					print 'photoState: ' + str(photoState)
@@ -96,9 +100,7 @@ while True :
 				# print 'numlaps: ' + str(numLaps)
 
 
-				for i in range(0, len(ardMsg)) :
-
-					print "entry " + str(i) + " is " + str(ardMsg[i])
+				
 			
 			# print "Pi: still ser isOpen" + str(ser.inWaiting())
 

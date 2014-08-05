@@ -9,7 +9,6 @@
 #include <stdlib.h>
 #include <avr/interrupt.h>
 
-
 extern "C" {
 
 	#include "devices.h"
@@ -23,6 +22,7 @@ unsigned long lastCycleMillis = 0;
 char piMsg[100];
 unsigned long valveMs;		// declare all the values the Arduino needs to pull from the stream  
 
+volatile boolean sendMsg = false;
 
 // Helper functions
 
@@ -45,36 +45,16 @@ boolean cycleCheck( unsigned long *lastMillis, unsigned int cycle )
 
 
 
-// // Define data output functions
 
-// // numLaps - Returns int value of total laps completed
-// int lastLap = 0, lastPhotoState = 0;
-// int numLaps( int *lastState ) {
-	
-// 	int currentState;
-// 	currentState = digitalRead(photoPin);
-// 	if (currentState != 0) {
-
-// 		if (currentState != *lastState) {
-
-// 			lastLap++;
-		
-// 		}
-
-// 	}
-
-// 	*lastState = currentState;
-// 	return lastLap;
-
-// }
 
 
 // sendSensorData - Prints sensor information to serial data stream 
 // Initialized with "DATA" and terminated with newline
-void sendSensorData() {
+void sendSensorData( void ) {
 
-	if (cycleCheck(&lastCycleMillis, sensorCycle)) {
 		
+		Serial.print(micros());	
+		Serial.print(",");
 		Serial.print("ARD,");						// entry 1 - data header
 		Serial.print("MS,");
 		Serial.print(millis());						// entry 2 - number of ms since runtime
@@ -82,16 +62,21 @@ void sendSensorData() {
 		Serial.print("PHOTO_STATE,");
 		Serial.print(photoState());					// entry 4 - state of photoPin
 		Serial.print(",");
+		Serial.print(micros());	
+		Serial.print(",");
 		Serial.print("\n");							// EOL
+		
 
-	}
+		sendMsg = false;
 
 }
+
+
 
 // Called when there is incoming information from the Pi
 // Returns true for valid message, false otherwise
 // Supports messages under 100 characters, with under 10 comma-separated keywords, that ends in '\n' 
-boolean processPiData() {
+boolean processPiData( void ) {
 
 	boolean proceed = Serial.readBytesUntil('\n', piMsg, 100);
 	if (proceed) {
@@ -138,9 +123,13 @@ boolean processPiData() {
 void setup() 
 {
 
+	cli();
 	// Configure pins
-	pinMode(photoPin, INPUT);			// open pin for reading input
+	pinMode(photoPin, INPUT_PULLUP);			// open pin for reading input
 	pinMode(valvePin, OUTPUT);			// open pin attached to relay board
+	
+	pinMode(13, OUTPUT);
+
 	Serial.begin(9600);					// initialize serial data stream
 	
 	// Configure interrupts
@@ -167,33 +156,24 @@ void loop()
 
 
 
-	// int prevPhotoState = photoState();
-	// delay(200);								
-	// // !! REMOVE DELAY !!
-	// if (photoState() != prevPhotoState) {
+	// if (Serial.available() > 0) {
 
-	// 	sendSensorData();
+	// 	// Serial.print("data available\n");
+	// 	processPiData();
+
+	// 	// if (parse) {
+
+	// 	// 	// event handling
+
+	// 	// } else {
+
+	// 	// 	// error handling
+
+	// 	// }
 
 	// }
 
-
-	if (Serial.available() > 0) {
-
-		// Serial.print("data available\n");
-		processPiData();
-
-		// if (parse) {
-
-		// 	// event handling
-
-		// } else {
-
-		// 	// error handling
-
-		// }
-
-	}
-
+	if (sendMsg) sendSensorData();
 
 }
 
@@ -202,6 +182,8 @@ void loop()
 // ISR for INT0 (photoPin) 
 ISR(INT0_vect) {
 
-	sendSensorData();
+	digitalWrite(13, !digitalRead(13));
+	sendMsg = true;
+
 
 }
