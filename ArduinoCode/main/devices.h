@@ -11,8 +11,9 @@
 #include <Arduino.h>
 
 
-#define photoPin 2
-#define valvePin 3
+#define photoPin 	2
+#define valvePin 	3
+#define ledPin 		13		// built-in LED on pin 13		
 
 
 // Opens valve for ms milliseconds

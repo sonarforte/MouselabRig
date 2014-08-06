@@ -32,9 +32,10 @@ while True :
 		print "Please connect the Arduino"
 		break
 
-print "goods"
+print "ready"
 
 ser.flushInput()
+ser.flushOutput()
 
 while True :
 
@@ -67,7 +68,7 @@ while True :
 				print ardMsg
 
 				# Assign important values from Ard to their variables
-				if ardMsg.index('ARD') == 0 :  
+				if ardMsg[0] == 'ARD' :  
 				
 					for i in range(1, len(ardMsg) - 1) : 
 

@@ -15,59 +15,31 @@ extern "C" {
 
 }
 
+/*---------------------------------------------------------------------
+---------------------------------------------------------------------*/
 
-#define sensorCycle 10
 
 unsigned long lastCycleMillis = 0;
-char piMsg[100];
+char piMsg[64];
+char ardMsg[64];
 unsigned long valveMs;		// declare all the values the Arduino needs to pull from the stream  
 
-volatile boolean sendMsg = false;
-
-// Helper functions
-
-// cycleCheck - returns true if "cycle" time has elapsed since "lastMillis"
-boolean cycleCheck( unsigned long *lastMillis, unsigned int cycle )
-{
-	unsigned long currentMillis = millis();
-	if (currentMillis - *lastMillis >= cycle) {
-
-		*lastMillis = currentMillis;
-		return true;
-
-	}
-	else {
-
-		return false;
-
-	}
-}
+volatile boolean sendMsg = false;	// send message flag - write true if new info to send
 
 
-
-
+/*---------------------------------------------------------------------
+---------------------------------------------------------------------*/
 
 
 // sendSensorData - Prints sensor information to serial data stream 
-// Initialized with "DATA" and terminated with newline
+// Headed with "ARD" and terminated with newline
 void sendSensorData( void ) {
 
+		// Format message string and send to Pi
+		snprintf( ardMsg, 64, "ARD,MS,%lu,PHOTO_STATE,%d,\n", millis(), photoState() );
+		Serial.print( ardMsg );
 		
-		Serial.print(micros());	
-		Serial.print(",");
-		Serial.print("ARD,");						// entry 1 - data header
-		Serial.print("MS,");
-		Serial.print(millis());						// entry 2 - number of ms since runtime
-		Serial.print(",");
-		Serial.print("PHOTO_STATE,");
-		Serial.print(photoState());					// entry 4 - state of photoPin
-		Serial.print(",");
-		Serial.print(micros());	
-		Serial.print(",");
-		Serial.print("\n");							// EOL
-		
-
-		sendMsg = false;
+		sendMsg = false;			// reset outgoing message flag
 
 }
 
@@ -120,15 +92,12 @@ boolean processPiData( void ) {
 }
 
 
-void setup() 
-{
+void setup() {
 
-	cli();
 	// Configure pins
-	pinMode(photoPin, INPUT_PULLUP);			// open pin for reading input
+	pinMode(photoPin, INPUT_PULLUP);	// open pin for reading input
 	pinMode(valvePin, OUTPUT);			// open pin attached to relay board
-	
-	pinMode(13, OUTPUT);
+	pinMode(ledPin, OUTPUT);			// open LED for visual feedback
 
 	Serial.begin(9600);					// initialize serial data stream
 	
@@ -138,15 +107,11 @@ void setup()
 	EICRA |= (1 << ISC00);				// trigger INT0 on any logical change
 
 
-
-
-
 }
 
 
 // Main loop - Prints sensor data. Rinse and repeat
-void loop() 
-{
+void loop() {
 	
 	// Test the relay...
 	// digitalWrite(valvePin, HIGH);
@@ -182,7 +147,7 @@ void loop()
 // ISR for INT0 (photoPin) 
 ISR(INT0_vect) {
 
-	digitalWrite(13, !digitalRead(13));
+	digitalWrite(ledPin, !digitalRead(ledPin));			// real-world indicator that interrupt has fired
 	sendMsg = true;
 
 
