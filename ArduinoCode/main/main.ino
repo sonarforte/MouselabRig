@@ -105,7 +105,7 @@ void setup() {
 	pinMode(valvePin, OUTPUT);			// open pin attached to relay board
 	pinMode(ledPin, OUTPUT);			// open LED for visual feedback
 
-	Serial.begin(9600);					// initialize serial data stream
+	Serial.begin(115200);					// initialize serial data stream
 	
 	// Configure interrupts
 	sei();								// enable global interrupts

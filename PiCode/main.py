@@ -1,3 +1,4 @@
+#!/usr/bin/python
 # main.py
 # Interfaces with Arduino via serial data stream
 # Steven Rofrano
@@ -14,7 +15,7 @@ prevPhotoState = 0
 
 # Initialize serial communications
 ser = serial.Serial()	
-ser.baudrate = 9600
+ser.baudrate = 115200
 
 # Identify valid serial port
 portNo = 0
