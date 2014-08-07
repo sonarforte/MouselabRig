@@ -35,7 +35,6 @@ while True :
 print "ready"
 
 ser.flushInput()
-ser.flushOutput()
 
 while True :
 
@@ -45,18 +44,7 @@ while True :
 
 		while ser.isOpen() :
 
-			# print "Pi: good connection"
-			# ser.write('RPI,VALVE_MS,500,\n')
-			# print "Pi: message sent"
-			# # time.sleep(5)
-			# # print "Pi: done sleeping"
-
-
-
-			# if ser.inWaiting > 0 :
-
-			# 	print "Ard: " + ser.readline()
-			# print "open for business"
+		
 
 			if ser.inWaiting() :
 
@@ -68,7 +56,7 @@ while True :
 				print ardMsg
 
 				# Assign important values from Ard to their variables
-				if ardMsg[0] == 'ARD' :  
+				if (ardMsg[0] == 'ARD') and (ardMsg[1:len(ardMsg)] != 'ARD'):  
 				
 					for i in range(1, len(ardMsg) - 1) : 
 
@@ -81,9 +69,7 @@ while True :
 							photoState = ardMsg[i + 1]
 
 
-					for i in range(0, len(ardMsg)) :
-
-						print "entry " + str(i) + " is " + str(ardMsg[i])
+					
 					
 					print 'millis: ' + str(millis)
 					print 'photoState: ' + str(photoState)

@@ -62,6 +62,8 @@ boolean processPiData( void ) {
 		// Begin parsing process
 		token = strtok(piMsg, s);
 
+		// Go through the rest of PiMsg (pass NULL to continue parsing piMsg)
+		//+ and assign each keyword to the next entry of strptr
 		while (token != NULL) {
 
 			strptr[numWords] = token;	// add the keyword pointer to the pointer array
@@ -90,6 +92,10 @@ boolean processPiData( void ) {
 
 	return false;
 }
+
+
+/*---------------------------------------------------------------------
+---------------------------------------------------------------------*/
 
 
 void setup() {
@@ -142,12 +148,16 @@ void loop() {
 
 }
 
+/*---------------------------------------------------------------------
+---------------------------------------------------------------------*/
+
+
 // Deal with the interrupts
 
 // ISR for INT0 (photoPin) 
 ISR(INT0_vect) {
 
-	digitalWrite(ledPin, !digitalRead(ledPin));			// real-world indicator that interrupt has fired
+	digitalWrite(ledPin, !digitalRead(ledPin));			// indicator that interrupt fired
 	sendMsg = true;
 
 
