@@ -7,7 +7,7 @@
 # import ardial
 import time
 import threading
-from ardData import ArdData 	# subclass of pySerial deals specifically with Arduino needs
+from data import ArdData 	# subclass of pySerial deals specifically with Arduino needs
 
 
 numLaps = 0
