@@ -10,7 +10,6 @@ import threading
 from data import ArdData 	# subclass of pySerial deals specifically with Arduino needs
 
 
-numLaps = 0
 prevPhotoState = 0
 
 
@@ -36,6 +35,7 @@ while True :
 				print ard.msg	
 				print 'millis: ', ard.millis
 				print 'photoState: ', ard.photoState
+				print 'numLaps: ', ard.numLaps
 				print 'received to date: ', ard.receivedMsgs
 
 

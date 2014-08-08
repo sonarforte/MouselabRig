@@ -19,6 +19,7 @@ class ArdData( serial.Serial ) :
 		self.startTime = 0
 		self.millis = 0
 		self.photoState = 0
+		self.numLaps = 0
 
 		super(ArdData, self).__init__(baudrate = rate)
 		# Identify valid serial port
@@ -48,7 +49,7 @@ class ArdData( serial.Serial ) :
 			return True
 
 
-	'''Parses the incoming stream and assigns the values to class variables'''
+	'''Parses the incoming stream and assigns the values to instance variables'''
 
 	def parseValues( self ) :
 
@@ -57,25 +58,42 @@ class ArdData( serial.Serial ) :
 
 		if self.msgCheck() :  
 
+			# update timer value
 			if 'MS' in self.msg :
-				i = self.msg.index('MS') + 1
-				ms = int(self.msg[i])
+				self.__getMS()
 
-				if self.receivedMsgs == 0 :
-					self.startTime = ms
-
-				self.millis = ms - self.startTime
-
+			# Update photo sensor value 
 			if 'PHOTO_STATE' in self.msg :
-				
-				i = self.msg.index('PHOTO_STATE') + 1
-				self.photoState = int(self.msg[i])
+				self.__getPS()
 
-			self.receivedMsgs += 1
-
-
+			self.receivedMsgs += 1			# keep track of total received messages
 
 		# for now... come up with a better way to handle this after implementation of experiments
 		else : 
 			pass 	# !!	
 
+
+	'''Pulls MS from data stream, normalizes the time and keeps a timer in self.millis'''
+
+	def __getMS( self ) :
+
+		i = self.msg.index('MS') + 1
+		self.millis = int(self.msg[i])
+
+		if self.receivedMsgs == 0 :
+			self.startTime = self.millis
+
+		self.millis -= self.startTime		# normalize timer to start at 0
+
+
+	'''Pulls PHOTO_STATE from stream and keeps track of number of laps'''
+
+	def __getPS( self ) : 
+
+		psOld = self.photoState
+		i = self.msg.index('PHOTO_STATE') + 1
+		self.photoState = int(self.msg[i])
+
+		# Incrememnt numLaps every time the sensor changes from 0 to 1
+		if (psOld == 0) and (self.photoState == 1) :
+			self.numLaps += 1
