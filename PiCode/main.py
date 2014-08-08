@@ -4,13 +4,9 @@
 # Steven Rofrano
 # 2014-07-28
 
-# import ardial
 import time
 import threading
 from data import ArdData 	# subclass of pySerial deals specifically with Arduino needs
-
-
-prevPhotoState = 0
 
 
 # Initialize communications
@@ -18,11 +14,7 @@ ard = ArdData(115200)
 
 print "ready"
 
-
-
 while True :
-
-	# print "begin loop"
 
 	try :
 

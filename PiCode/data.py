@@ -45,8 +45,7 @@ class ArdData( serial.Serial ) :
 
 	def msgCheck( self ) :
 
-		if (self.msg[0] == 'ARD') and (self.msg[1:len(self.msg)] != 'ARD') : 
-			return True
+		return bool(self.msg[0] == 'ARD') and (self.msg[1:len(self.msg)] != 'ARD')
 
 
 	'''Parses the incoming stream and assigns the values to instance variables'''

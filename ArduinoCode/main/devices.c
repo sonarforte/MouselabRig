@@ -31,3 +31,14 @@ int photoState( void ) {
 
 }
 
+int *optValues( void ) {
+
+	int readout[3], i;
+	for (i = 0; i < 3; i++) {
+
+		readout[i] = digitalRead(optCh1Pin + 1);
+	} 
+
+	return readout;
+
+}

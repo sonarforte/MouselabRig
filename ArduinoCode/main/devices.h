@@ -13,6 +13,9 @@
 
 #define photoPin 	2
 #define valvePin 	3
+#define optCh1Pin	4
+#define optChAPin	5
+#define optChBPin	6
 #define ledPin 		13		// built-in LED on pin 13		
 
 
@@ -21,5 +24,8 @@ void valveOpen( int ms );
 
 // Returns state of photo sensor
 int photoState( void );
+
+// Returns 3-value int array with values from Ch1, ChA, and ChB
+int *optValues( void );
 
 #endif

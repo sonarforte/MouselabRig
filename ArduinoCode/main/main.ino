@@ -23,6 +23,7 @@ unsigned long lastCycleMillis = 0;
 char piMsg[64];
 char ardMsg[64];
 unsigned long valveMs;		// declare all the values the Arduino needs to pull from the stream  
+unsigned long lastTime = 0;
 
 volatile boolean sendMsg = false;	// send message flag - write true if new info to send
 
@@ -36,8 +37,11 @@ volatile boolean sendMsg = false;	// send message flag - write true if new info 
 void sendSensorData( void ) {
 
 		// Format message string and send to Pi
-		snprintf( ardMsg, 64, "ARD,MS,%lu,PHOTO_STATE,%d,\n", millis(), photoState() );
-		Serial.print( ardMsg );
+		snprintf(ardMsg, 64, 
+			"ARD,MS,%lu,PHOTO_STATE,%d,OPT_CH1,%d,OPT_CHA,%d,OPT_CHB,%d,\n", 
+			millis(), photoState(), optValues()[0], optValues()[1], optValues()[2]);
+		
+		Serial.print(ardMsg);
 		
 		sendMsg = false;			// reset outgoing message flag
 
@@ -104,6 +108,12 @@ void setup() {
 	pinMode(photoPin, INPUT_PULLUP);	// open pin for reading input
 	pinMode(valvePin, OUTPUT);			// open pin attached to relay board
 	pinMode(ledPin, OUTPUT);			// open LED for visual feedback
+	
+	// Open optical encoder pins
+	pinMode(optCh1Pin, INPUT);
+	pinMode(optChAPin, INPUT);
+	pinMode(optChBPin, INPUT);
+
 
 	Serial.begin(115200);					// initialize serial data stream
 	
@@ -119,6 +129,16 @@ void setup() {
 // Main loop - Prints sensor data. Rinse and repeat
 void loop() {
 	
+	if (millis() - lastTime >= 1000) {
+
+		lastTime = millis();
+		sendSensorData();
+
+
+	}
+
+
+
 	// Test the relay...
 	// digitalWrite(valvePin, HIGH);
 	// delay(2000);
@@ -144,7 +164,12 @@ void loop() {
 
 	// }
 
-	if (sendMsg) sendSensorData();
+
+
+
+
+
+	// if (sendMsg) sendSensorData();
 
 }
 
