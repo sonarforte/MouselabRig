@@ -1,3 +1,4 @@
+
 // main.ino
 // Communicates with RPi through serial data stream
 // Steven Rofrano
@@ -122,6 +123,8 @@ void setup() {
 	EIMSK |= (1 << INT0);				// enable external interrupt INT0 (I/O pin 2)
 	EICRA |= (1 << ISC00);				// trigger INT0 on any logical change
 
+	
+
 
 }
 
@@ -169,7 +172,7 @@ void loop() {
 
 
 
-	// if (sendMsg) sendSensorData();
+	if (sendMsg) sendSensorData();
 
 }
 
@@ -187,3 +190,4 @@ ISR(INT0_vect) {
 
 
 }
+
