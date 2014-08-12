@@ -9,6 +9,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <avr/interrupt.h>
+#include <avr/io.h>
 
 extern "C" {
 
@@ -21,8 +22,8 @@ extern "C" {
 
 
 unsigned long lastCycleMillis = 0;
-char piMsg[64];
-char ardMsg[64];
+char piMsg[100];
+
 unsigned long valveMs;		// declare all the values the Arduino needs to pull from the stream  
 unsigned long lastTime = 0;
 
@@ -38,14 +39,15 @@ volatile boolean sendMsg = false;	// send message flag - write true if new info 
 void sendSensorData( void ) {
 
 		// Format message string and send to Pi
-		snprintf(ardMsg, 64, 
-			"ARD,MS,%lu,PHOTO_STATE,%d,OPT_CH1,%d,OPT_CHA,%d,OPT_CHB,%d,\n", 
-			millis(), photoState(), optValues()[0], optValues()[1], optValues()[2]);
+		char ardMsg[100];
+		snprintf(ardMsg, 100, 
+			"ARD,MS,%lu,PHOTO_STATE,%d,OPT_CH1,%d,OPT_CHA,%d,OPT_CHB,%d,EOL,\n", 
+			millis(), pinDRead(photoPin), pinDRead(optCh1Pin), pinDRead(optChAPin), 
+			pinDRead(optChBPin)); 
 		
 		Serial.print(ardMsg);
 		
 		sendMsg = false;			// reset outgoing message flag
-
 }
 
 
@@ -119,12 +121,15 @@ void setup() {
 	Serial.begin(115200);					// initialize serial data stream
 	
 	// Configure interrupts
-	sei();								// enable global interrupts
+									
 	EIMSK |= (1 << INT0);				// enable external interrupt INT0 (I/O pin 2)
 	EICRA |= (1 << ISC00);				// trigger INT0 on any logical change
 
-	
+	PCICR |= (1 << PCIE2);				// enable Pin Change Interrupt 2
+	PCMSK2 |= (1 << PCINT21);			// enable PCIR on AVR PD5 (I/O pin 5) for OptChA
+	PCMSK2 |= (1 << PCINT22);			// enable PCIR on AVR PD6 (I/O pin 6) for OptChA
 
+	sei();								// enable global interrupts
 
 }
 
@@ -132,13 +137,13 @@ void setup() {
 // Main loop - Prints sensor data. Rinse and repeat
 void loop() {
 	
-	if (millis() - lastTime >= 1000) {
+	// if (millis() - lastTime >= 1000) {
 
-		lastTime = millis();
-		sendSensorData();
+	// 	lastTime = millis();
+	// 	sendSensorData();
 
 
-	}
+	// }
 
 
 
@@ -172,8 +177,16 @@ void loop() {
 
 
 
-	if (sendMsg) sendSensorData();
+	if (sendMsg) {
 
+		sendSensorData();
+		// Serial.print(lastTime);
+		// Serial.print("\n");
+		// lastTime ++;
+		// sendMsg = false;
+
+
+	}
 }
 
 /*---------------------------------------------------------------------
@@ -185,9 +198,16 @@ void loop() {
 // ISR for INT0 (photoPin) 
 ISR(INT0_vect) {
 
-	digitalWrite(ledPin, !digitalRead(ledPin));			// indicator that interrupt fired
+	// digitalWrite(ledPin, !digitalRead(ledPin));			// indicator that interrupt fired
 	sendMsg = true;
 
 
 }
 
+// Responds to interrupt from PD5 or PD6
+ISR(PCINT2_vect) {
+
+	digitalWrite(ledPin, !digitalRead(ledPin));			// indicator that interrupt fired
+	sendMsg = true;
+
+}

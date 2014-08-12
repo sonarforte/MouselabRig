@@ -9,6 +9,8 @@
 #define DEVICES_H_
 
 #include <Arduino.h>
+#include <avr/interrupt.h>
+#include <avr/io.h>
 
 
 #define photoPin 	2
@@ -22,10 +24,7 @@
 // Opens valve for ms milliseconds
 void valveOpen( int ms );
 
-// Returns state of photo sensor
-int photoState( void );
-
-// Returns 3-value int array with values from Ch1, ChA, and ChB
-int *optValues( void );
+// Returns state of input pin i from 0 to 7
+int pinDRead( int i );
 
 #endif

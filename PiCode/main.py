@@ -22,13 +22,15 @@ while True :
 
 			if ard.inWaiting() :
 
-				ard.parseValues()
+				print ard.getMsg()
 
-				print ard.msg	
-				print 'millis: ', ard.millis
-				print 'photoState: ', ard.photoState
-				print 'numLaps: ', ard.numLaps
-				print 'received to date: ', ard.receivedMsgs
+				# ard.parseValues()
+
+				# print ard.msg	
+				# print 'millis: ', ard.millis
+				# print 'photoState: ', ard.photoState
+				# print 'numLaps: ', ard.numLaps
+				# print 'received to date: ', ard.receivedMsgs
 
 
 

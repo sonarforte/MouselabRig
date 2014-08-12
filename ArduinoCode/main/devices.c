@@ -1,4 +1,4 @@
-// devices.c
+  // devices.c
 // Defines device interface functions 
 // Steven Rofrano
 // 2014-07-28
@@ -24,21 +24,9 @@ void valveOpen( int ms ) {
 
 }
 
-// Returns state of photo sensor
-int photoState( void ) {
+// Returns state of specified digital pin
+int pinDRead( int i ) {
 
-	return digitalRead(photoPin);
-
-}
-
-int *optValues( void ) {
-
-	int readout[3], i;
-	for (i = 0; i < 3; i++) {
-
-		readout[i] = digitalRead(optCh1Pin + 1);
-	} 
-
-	return readout;
+	return bitRead(PIND, i);
 
 }

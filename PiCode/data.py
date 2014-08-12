@@ -40,6 +40,14 @@ class ArdData( serial.Serial ) :
 
 		self.flushInput()
 
+	'''Reads the message from Arduino and separates data by commas into a list'''
+
+	def getMsg( self ) :
+
+		self.msg = self.readline().split(',')
+		return self.msg
+
+
 
 	'''Returns true if the incoming data stream adheres to message protocol'''
 
@@ -52,17 +60,16 @@ class ArdData( serial.Serial ) :
 
 	def parseValues( self ) :
 
-		self.msg = self.readline().split(',')
-
+		lst = self.getMsg()
 
 		if self.msgCheck() :  
 
 			# update timer value
-			if 'MS' in self.msg :
+			if 'MS' in lst :
 				self.__getMS()
 
 			# Update photo sensor value 
-			if 'PHOTO_STATE' in self.msg :
+			if 'PHOTO_STATE' in lst :
 				self.__getPS()
 
 			self.receivedMsgs += 1			# keep track of total received messages
@@ -89,6 +96,7 @@ class ArdData( serial.Serial ) :
 
 	def __getPS( self ) : 
 
+		print "--getPS"
 		psOld = self.photoState
 		i = self.msg.index('PHOTO_STATE') + 1
 		self.photoState = int(self.msg[i])
