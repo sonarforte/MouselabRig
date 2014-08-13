@@ -28,7 +28,8 @@ unsigned long valveMs;		// declare all the values the Arduino needs to pull from
 unsigned long lastTime = 0;
 
 volatile boolean sendMsg = false;	// send message flag - write true if new info to send
-
+char ardMsg[100];
+unsigned long msgNo = 0;
 
 /*---------------------------------------------------------------------
 ---------------------------------------------------------------------*/
@@ -39,10 +40,11 @@ volatile boolean sendMsg = false;	// send message flag - write true if new info 
 void sendSensorData( void ) {
 
 		// Format message string and send to Pi
-		char ardMsg[100];
+		msgNo++;
+
 		snprintf(ardMsg, 100, 
-			"ARD,MS,%lu,PHOTO_STATE,%d,OPT_CH1,%d,OPT_CHA,%d,OPT_CHB,%d,EOL,\n", 
-			millis(), pinDRead(photoPin), pinDRead(optCh1Pin), pinDRead(optChAPin), 
+			"ARD,N,%lu,MS,%lu,PS,%d,CH1,%d,CHA,%d,CHB,%d,EOL,\n", 
+			msgNo, millis(), pinDRead(photoPin), pinDRead(optCh1Pin), pinDRead(optChAPin), 
 			pinDRead(optChBPin)); 
 		
 		Serial.print(ardMsg);
@@ -118,7 +120,7 @@ void setup() {
 	pinMode(optChBPin, INPUT);
 
 
-	Serial.begin(115200);					// initialize serial data stream
+	Serial.begin(115200);				// initialize serial data stream
 	
 	// Configure interrupts
 									
@@ -177,16 +179,8 @@ void loop() {
 
 
 
-	if (sendMsg) {
+	if (sendMsg) sendSensorData();
 
-		sendSensorData();
-		// Serial.print(lastTime);
-		// Serial.print("\n");
-		// lastTime ++;
-		// sendMsg = false;
-
-
-	}
 }
 
 /*---------------------------------------------------------------------

@@ -11,6 +11,7 @@ from data import ArdData 	# subclass of pySerial deals specifically with Arduino
 
 # Initialize communications
 ard = ArdData(115200)
+outfile = open('log.txt', 'w')
 
 print "ready"
 
@@ -24,13 +25,24 @@ while True :
 
 				print ard.getMsg()
 
-				# ard.parseValues()
+				ard.parseValues()
 
-				# print ard.msg	
-				# print 'millis: ', ard.millis
-				# print 'photoState: ', ard.photoState
-				# print 'numLaps: ', ard.numLaps
-				# print 'received to date: ', ard.receivedMsgs
+				print 'millis: ', ard.millis
+				print 'photoState: ', ard.photoState
+				print 'numLaps: ', ard.numLaps
+				print 'ChA: ', ard.chA
+				print 'ChB: ', ard.chB
+				print 'received to date: ', ard.receivedMsgs, '\n'
+
+				dataline = "PI,N,%d,MS,%d,PS,%d,NL,%d,CHA,%d,CHB,%d,\n" % (ard.receivedMsgs, 
+						ard.millis, ard.photoState, ard.numLaps, ard.chA, ard.chB)
+
+				
+
+				if ard.receivedMsgs < 1000 :
+					outfile.write(dataline)
+				elif ard.receivedMsgs == 1000 :
+					outfile.close()
 
 
 

@@ -20,6 +20,9 @@ class ArdData( serial.Serial ) :
 		self.millis = 0
 		self.photoState = 0
 		self.numLaps = 0
+		self.chA = 0
+		self.chB = 0
+		self.ch1 = 0
 
 		super(ArdData, self).__init__(baudrate = rate)
 		# Identify valid serial port
@@ -53,14 +56,15 @@ class ArdData( serial.Serial ) :
 
 	def msgCheck( self ) :
 
-		return bool(self.msg[0] == 'ARD') and (self.msg[1:len(self.msg)] != 'ARD')
-
+		header = bool((self.msg[0] == 'ARD') and (self.msg[1:(len(self.msg) - 1)] != 'ARD'))
+		trailer = bool(self.msg[len(self.msg) - 2] == 'EOL')
+		return header and trailer
 
 	'''Parses the incoming stream and assigns the values to instance variables'''
 
 	def parseValues( self ) :
 
-		lst = self.getMsg()
+		lst = self.msg
 
 		if self.msgCheck() :  
 
@@ -69,8 +73,11 @@ class ArdData( serial.Serial ) :
 				self.__getMS()
 
 			# Update photo sensor value 
-			if 'PHOTO_STATE' in lst :
+			if 'PS' in lst :
 				self.__getPS()
+
+			if ('CHA' and 'CHB') in lst :
+				self.__getENC()
 
 			self.receivedMsgs += 1			# keep track of total received messages
 
@@ -96,11 +103,24 @@ class ArdData( serial.Serial ) :
 
 	def __getPS( self ) : 
 
-		print "--getPS"
 		psOld = self.photoState
-		i = self.msg.index('PHOTO_STATE') + 1
+		i = self.msg.index('PS') + 1
 		self.photoState = int(self.msg[i])
 
 		# Incrememnt numLaps every time the sensor changes from 0 to 1
 		if (psOld == 0) and (self.photoState == 1) :
 			self.numLaps += 1
+
+
+	'''Pulls encoder values from stream'''
+
+	def __getENC( self ) :
+
+		i = self.msg.index('CHA') + 1
+		self.chA = int(self.msg[i])
+
+		j = self.msg.index('CHB') + 1
+		self.chB = int(self.msg[j])
+
+		k = self.msg.index('CH1') + 1
+		self.ch1 = int(self.msg[k]) 
