@@ -25,14 +25,14 @@ while True :
 
 				print ard.getMsg()
 
-				ard.parseValues()
+				# ard.parseValues()
 
-				print 'millis: ', ard.millis
-				print 'photoState: ', ard.photoState
-				print 'numLaps: ', ard.numLaps
-				print 'ChA: ', ard.chA
-				print 'ChB: ', ard.chB
-				print 'received to date: ', ard.receivedMsgs, '\n'
+				# print 'millis: ', ard.millis
+				# print 'photoState: ', ard.photoState
+				# print 'numLaps: ', ard.numLaps
+				# print 'ChA: ', ard.chA
+				# print 'ChB: ', ard.chB
+				# print 'received to date: ', ard.receivedMsgs, '\n'
 
 				dataline = "PI,N,%d,MS,%d,PS,%d,NL,%d,CHA,%d,CHB,%d,\n" % (ard.receivedMsgs, 
 						ard.millis, ard.photoState, ard.numLaps, ard.chA, ard.chB)
