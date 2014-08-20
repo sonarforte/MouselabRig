@@ -12,11 +12,11 @@
 #include <avr/interrupt.h>
 #include <avr/io.h>
 
-#define photoPin 	2
-#define valvePin 	3
+#define photoPin 	5
+#define valvePin 	6
 #define optCh1Pin	4
-#define optChAPin	5
-#define optChBPin	6
+#define optChAPin	2
+#define optChBPin	3
 #define ledPin 		13		// built-in LED on pin 13		
 
 // Opens valve for ms milliseconds

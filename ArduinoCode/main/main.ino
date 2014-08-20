@@ -123,14 +123,19 @@ void setup() {
 	
 	// Configure interrupts
 									
-	EIMSK |= (1 << INT0);				// enable external interrupt INT0 (I/O pin 2)
-	EICRA |= (1 << ISC00);				// trigger INT0 on any logical change
+	// Optical encoder ChA interrupt									
+	EIMSK |= (1 << INT0);					// enable external interrupt INT0 (I/O pin 2)
+	EICRA |= ((1 << ISC01) | (1 << ISC00));	// trigger INT0 on rising edge
 
-	PCICR |= (1 << PCIE2);				// enable Pin Change Interrupt 2
-	PCMSK2 |= (1 << PCINT21);			// enable PCIR on AVR PD5 (I/O pin 5) for OptChA
-	PCMSK2 |= (1 << PCINT22);			// enable PCIR on AVR PD6 (I/O pin 6) for OptChA
+	// Optical enncoder ChB interrupt
+	EIMSK |= (1 << INT1);					// enable external interrupt INT1 (I/O pin 3)
+	EICRA |= ((1 << ISC11) | (1 << ISC10));	// trigger INT1 on rising edge
 
-	sei();								// enable global interrupts
+	// Photo sensor interrupt
+	PCICR |= (1 << PCIE2);					// enable Pin Change Interrupt 2
+	PCMSK2 |= (1 << PCINT21);				// enable PCIR on AVR PD5 (I/O pin 5) 
+
+	sei();									// enable global interrupts
 
 }
 
