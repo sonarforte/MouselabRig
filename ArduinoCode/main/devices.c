@@ -30,3 +30,4 @@ int pinDRead( int i ) {
 	return bitRead(PIND, i);
 
 }
+

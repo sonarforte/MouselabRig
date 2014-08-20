@@ -41,7 +41,6 @@ void sendSensorData( void ) {
 
 		// Format message string and send to Pi
 		msgNo++;
-
 		snprintf(ardMsg, 100, 
 			"ARD,N,%lu,MS,%lu,PS,%d,CH1,%d,CHA,%d,CHB,%d,EOL,\n", 
 			msgNo, millis(), pinDRead(photoPin), pinDRead(optCh1Pin), pinDRead(optChAPin), 
@@ -178,8 +177,11 @@ void loop() {
 
 
 
+		if (sendMsg) sendSensorData();
 
-	if (sendMsg) sendSensorData();
+
+
+
 
 }
 
