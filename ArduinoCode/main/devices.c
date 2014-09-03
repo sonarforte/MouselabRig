@@ -12,7 +12,7 @@
 void valveOpen( int ms ) {
 
 	unsigned long startTime = millis();
-	digitalWrite(valvePin, HIGH);
+	digitalWrite(VALVE_PIN, HIGH);
 
 	while  (millis() - startTime < ms) {
 		
@@ -20,14 +20,20 @@ void valveOpen( int ms ) {
 	
 	}
 	
-	digitalWrite(valvePin, LOW);
+	digitalWrite(VALVE_PIN, LOW);
 
 }
 
-// Returns state of specified digital pin
-int pinDRead( int i ) {
+// // Returns state of specified digital pin
+// int pinDRead( int i ) {
 
-	return bitRead(PIND, i);
+// 	return bitRead(PIND, i);
 
-}
+// }
 
+// int pinDWrite( int i, int b ) {
+
+// 	if (b != 0) b = 1;
+// 	bitWrite(PIND, i, b); 
+
+// }

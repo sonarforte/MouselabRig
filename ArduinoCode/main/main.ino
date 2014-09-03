@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include <avr/interrupt.h>
 #include <avr/io.h>
+#include "digitalWriteFast.h"
 
 extern "C" {
 
@@ -31,6 +32,8 @@ volatile boolean sendMsg = false;	// send message flag - write true if new info 
 char ardMsg[100];
 unsigned long msgNo = 0;
 
+volatile int currentChA, currentChB, prevChA, prevChB;
+
 /*---------------------------------------------------------------------
 ---------------------------------------------------------------------*/
 
@@ -41,10 +44,10 @@ void sendSensorData( void ) {
 
 		// Format message string and send to Pi
 		msgNo++;
-		snprintf(ardMsg, 100, 
-			"ARD,N,%lu,MS,%lu,PS,%d,CH1,%d,CHA,%d,CHB,%d,EOL,\n", 
-			msgNo, millis(), pinDRead(photoPin), pinDRead(optCh1Pin), pinDRead(optChAPin), 
-			pinDRead(optChBPin)); 
+		snprintf(ardMsg, 64, 
+			"ARD,N,%lu,MS,%lu,PS,%d,CHA,%d,CHB,%d,EOL,\n", 
+			msgNo, millis(), digitalReadFast(PHOTO_PIN), digitalReadFast(OPT_CHA_PIN), 
+			digitalReadFast(OPT_CHB_PIN)); 
 		
 		Serial.print(ardMsg);
 		
@@ -109,30 +112,34 @@ boolean processPiData( void ) {
 void setup() {
 
 	// Configure pins
-	pinMode(photoPin, INPUT_PULLUP);	// open pin for reading input
-	pinMode(valvePin, OUTPUT);			// open pin attached to relay board
-	pinMode(ledPin, OUTPUT);			// open LED for visual feedback
+	pinMode(PHOTO_PIN, INPUT_PULLUP);	// open pin for reading input
+	pinMode(VALVE_PIN, OUTPUT);			// open pin attached to relay board
+	pinMode(LED_PIN, OUTPUT);			// open LED for visual feedback
 	
 	// Open optical encoder pins
-	pinMode(optCh1Pin, INPUT);
-	pinMode(optChAPin, INPUT);
-	pinMode(optChBPin, INPUT);
+	pinMode(OPT_CH1_PIN, INPUT);
+	pinMode(OPT_CHA_PIN, INPUT);
+	pinMode(OPT_CHB_PIN, INPUT);
 
 
-	Serial.begin(115200);				// initialize serial data stream
+	Serial.begin(115200);					// initialize serial data stream
 	
 	// Configure interrupts
 									
 	// Optical encoder ChA interrupt									
-	EIMSK |= (1 << INT0);					// enable external interrupt INT0 (I/O pin 2)
-	EICRA |= ((1 << ISC01) | (1 << ISC00));	// trigger INT0 on rising edge
+	// EIMSK |= (1 << INT0);					// enable external interrupt INT0 (I/O pin 2)
+	// // EICRA |= ((1 << ISC01) | (1 << ISC00));	// trigger INT0 on rising edge
+	// // EICRA |= (1 << ISC00);					// trigger INT0 on logical change
+	// EICRA |= (1 << ISC01); 					// trigger INT0 on falling edge
 
 	// Optical enncoder ChB interrupt
 	EIMSK |= (1 << INT1);					// enable external interrupt INT1 (I/O pin 3)
-	EICRA |= ((1 << ISC11) | (1 << ISC10));	// trigger INT1 on rising edge
+	// EICRA |= ((1 << ISC11) | (1 << ISC10));	// trigger INT1 on rising edge
+	EICRA |= (1 << ISC10);					// trigger INT1 on a logical change
+
 
 	// Photo sensor interrupt
-	PCICR |= (1 << PCIE2);					// enable Pin Change Interrupt 2
+	PCICR |= (1 << PCIE2);					// enable Pin Change Interrupt 2 (AVR pins 23-16)
 	PCMSK2 |= (1 << PCINT21);				// enable PCIR on AVR PD5 (I/O pin 5) 
 
 	sei();									// enable global interrupts
@@ -143,10 +150,11 @@ void setup() {
 // Main loop - Prints sensor data. Rinse and repeat
 void loop() {
 	
-	// if (millis() - lastTime >= 1000) {
+	// if (millis() - lastTime >= 500) {
 
 	// 	lastTime = millis();
-	// 	sendSensorData();
+	// 	// sendSensorData();
+	// 	digitalWrite(LED_PIN, !digitalRead(LED_PIN));
 
 
 	// }
@@ -154,9 +162,9 @@ void loop() {
 
 
 	// Test the relay...
-	// digitalWrite(valvePin, HIGH);
+	// digitalWrite(VALVE_PIN, HIGH);
 	// delay(2000);
-	// digitalWrite(valvePin, LOW);
+	// digitalWrite(VALVE_PIN, LOW);
 	// delay(2000);
 
 
@@ -181,12 +189,8 @@ void loop() {
 
 
 
-
-		if (sendMsg) sendSensorData();
-
-
-
-
+	if (sendMsg) sendSensorData();
+	
 
 }
 
@@ -196,19 +200,27 @@ void loop() {
 
 // Deal with the interrupts
 
-// ISR for INT0 (photoPin) 
+// ISR for INT0 (PHOTO_PIN) 
 ISR(INT0_vect) {
 
-	// digitalWrite(ledPin, !digitalRead(ledPin));			// indicator that interrupt fired
+	// digitalWrite(LED_PIN, !digitalRead(LED_PIN));		// indicator that interrupt fired
+	
+
 	sendMsg = true;
 
 
 }
 
-// Responds to interrupt from PD5 or PD6
+ISR(INT1_vect) {
+
+	// digitalWrite(LED_PIN, !digitalRead(LED_PIN));		// indicator that interrupt fired
+	sendMsg = true;
+
+}
+
+// Responds to interrupt from PD5
 ISR(PCINT2_vect) {
 
-	digitalWrite(ledPin, !digitalRead(ledPin));			// indicator that interrupt fired
 	sendMsg = true;
 
 }

@@ -121,6 +121,3 @@ class ArdData( serial.Serial ) :
 
 		j = self.msg.index('CHB') + 1
 		self.chB = int(self.msg[j])
-
-		k = self.msg.index('CH1') + 1
-		self.ch1 = int(self.msg[k]) 

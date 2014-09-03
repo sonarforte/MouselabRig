@@ -23,16 +23,16 @@ while True :
 
 			if ard.inWaiting() :
 
-				print ard.getMsg()
+				print ard.getMsg()		# reads the stream from the Arduino into a list
 
-				# ard.parseValues()
+				ard.parseValues()
 
 				# print 'millis: ', ard.millis
 				# print 'photoState: ', ard.photoState
 				# print 'numLaps: ', ard.numLaps
 				# print 'ChA: ', ard.chA
 				# print 'ChB: ', ard.chB
-				# print 'received to date: ', ard.receivedMsgs, '\n'
+				print 'received to date: ', ard.receivedMsgs, '\n'
 
 				dataline = "PI,N,%d,MS,%d,PS,%d,NL,%d,CHA,%d,CHB,%d,\n" % (ard.receivedMsgs, 
 						ard.millis, ard.photoState, ard.numLaps, ard.chA, ard.chB)
@@ -53,5 +53,6 @@ while True :
 	except IOError :
 
 		print "Plug the Arduino back in"
+		time.sleep(2)
 
 print "end loop"

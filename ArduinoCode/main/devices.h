@@ -12,17 +12,20 @@
 #include <avr/interrupt.h>
 #include <avr/io.h>
 
-#define photoPin 	5
-#define valvePin 	6
-#define optCh1Pin	4
-#define optChAPin	2
-#define optChBPin	3
-#define ledPin 		13		// built-in LED on pin 13		
+#define PHOTO_PIN 	5
+#define VALVE_PIN 	6
+#define OPT_CH1_PIN	4
+#define OPT_CHA_PIN	2
+#define OPT_CHB_PIN	3
+#define LED_PIN 	13		// built-in LED on pin 13		
 
 // Opens valve for ms milliseconds
 void valveOpen( int ms );
 
-// Returns state of input pin i from 0 to 7
-int pinDRead( int i );
+// // Returns state of input pin i from 0 to 7
+// int pinDRead( int i );
+
+// // Writes 0 or 1 to pin i from 0 to 7
+// int pinDWrite( int i, int b );
 
 #endif
