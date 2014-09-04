@@ -19,6 +19,9 @@
 #define OPT_CHB_PIN	3
 #define LED_PIN 	13		// built-in LED on pin 13		
 
+#define A02			500
+#define C02			100
+
 // Opens valve for ms milliseconds
 void valveOpen( int ms );
 

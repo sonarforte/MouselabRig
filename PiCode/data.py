@@ -5,24 +5,36 @@
 # 2014-08-07
 
 import serial
+import math
 
 
 class ArdData( serial.Serial ) :
 	
-	'''Finds the correct port and initializes serial communication at baudrate "rate"'''
+	'''Finds the correct port and initializes serial communication at baudrate "rate"
+	Takes the name of the encoder as a string for motion calculations'''
 	 
-	def __init__( self, rate ) :
+	def __init__( self, rate, enc = 'A02' ) :
 		
-		self.receivedMsgs = 0
 		self.sentMsgs = 0
 
 		self.startTime = 0
-		self.millis = 0
+		self.time = []
 		self.photoState = 0
 		self.numLaps = 0
-		self.chA = 0
-		self.chB = 0
-		self.ch1 = 0
+		self.laps = []
+		self.ticks = 0
+		self.displacement = []			# list contains linear displacement (time component in millis)
+		self.position = []				# list contains linear position in current lap
+		self.velocity = []			# list contains linear velocity
+		self.radius = 5 		# wheel radius is 5 cm
+		self.revs = 0
+		self.index = 0			# number of messages received
+		self.lapDist = 0
+		if enc == 'A02' :
+			self.ppr = 500
+		elif enc == 'C02' :
+			self.ppr = 100
+
 
 		super(ArdData, self).__init__(baudrate = rate)
 		# Identify valid serial port
@@ -57,7 +69,7 @@ class ArdData( serial.Serial ) :
 	def msgCheck( self ) :
 
 		header = bool((self.msg[0] == 'ARD') and (self.msg[1:(len(self.msg) - 1)] != 'ARD'))
-		trailer = bool(self.msg[len(self.msg) - 2] == 'EOL')
+		trailer = bool(self.msg[len(self.msg) - 1] == '\n')
 		return header and trailer
 
 	'''Parses the incoming stream and assigns the values to instance variables'''
@@ -72,14 +84,16 @@ class ArdData( serial.Serial ) :
 			if 'MS' in lst :
 				self.__getMS()
 
+			if ('TKS') in lst :
+				self.__getENC()
+
 			# Update photo sensor value 
 			if 'PS' in lst :
 				self.__getPS()
 
-			if ('CHA' and 'CHB') in lst :
-				self.__getENC()
+			
 
-			self.receivedMsgs += 1			# keep track of total received messages
+			self.index += 1			# update message index number
 
 		# for now... come up with a better way to handle this after implementation of experiments
 		else : 
@@ -90,34 +104,65 @@ class ArdData( serial.Serial ) :
 
 	def __getMS( self ) :
 
-		i = self.msg.index('MS') + 1
-		self.millis = int(self.msg[i])
+		k = self.msg.index('MS') + 1
+		self.millis = int(self.msg[k])
 
-		if self.receivedMsgs == 0 :
+		if self.index == 0 :
 			self.startTime = self.millis
 
 		self.millis -= self.startTime		# normalize timer to start at 0
 
+		self.time.append(self.millis)
 
-	'''Pulls PHOTO_STATE from stream and keeps track of number of laps'''
+
+	
 
 	def __getPS( self ) : 
+		'''Pulls PHOTO_STATE from stream and keeps track of number of laps'''
 
 		psOld = self.photoState
-		i = self.msg.index('PS') + 1
-		self.photoState = int(self.msg[i])
+		k = self.msg.index('PS') + 1
+		self.photoState = int(self.msg[k])
 
 		# Incrememnt numLaps every time the sensor changes from 0 to 1
-		if (psOld == 0) and (self.photoState == 1) :
-			self.numLaps += 1
+		if (psOld == 0) and (self.photoState == 1) and (self.index > 10) :
+			avgVel = 0
+			for j in range(self.index - 10, self.index) :
+				avgVel += self.velocity[j]
+			# Only counts a lap if the belt is moving forward
+			if (avgVel / 10) > 0:
+				self.numLaps += 1
+				self.__resetPosition()
 
+		self.laps.append(self.numLaps)
 
-	'''Pulls encoder values from stream'''
 
 	def __getENC( self ) :
+		'''Does math on net encoder ticks. 
 
-		i = self.msg.index('CHA') + 1
-		self.chA = int(self.msg[i])
+		Finds revolutions, total displacement, and instantaneous velocity'''
+		k = self.msg.index('TKS') + 1
+		ticks = float(self.msg[k])
+		
+		i = self.index
 
-		j = self.msg.index('CHB') + 1
-		self.chB = int(self.msg[j])
+		self.revs = ticks / (2 * self.ppr)
+		disp = 2 * math.pi * self.radius * self.revs
+		self.displacement.append(disp)
+		self.position.append(disp - self.lapDist)
+		if i == 0 :
+			self.velocity.append(0)
+		else :
+			self.velocity.append((1000 * (self.displacement[i] - self.displacement[i - 1]) / 
+								   (self.time[i] - self.time[i - 1])))
+
+
+
+
+	def __resetPosition( self ) :
+		'''Keeps track of position within the lap.
+
+		Resets every time numLaps is incremented. Maintains a list similar to self. displacement,
+		whose contents are the total displacement from the lap origin'''
+
+		self.lapDist = self.displacement[self.index]
