@@ -55,26 +55,29 @@ class ArdData( serial.Serial ) :
 
 		self.flushInput()
 
-	'''Reads the message from Arduino and separates data by commas into a list'''
+	
 
-	def getMsg( self ) :
+	def msgToList( self ) :
+		'''Reads the message from Arduino and separates data by commas into a list'''
 
 		self.msg = self.readline().split(',')
 		return self.msg
 
 
 
-	'''Returns true if the incoming data stream adheres to message protocol'''
+	
 
 	def msgCheck( self ) :
+		'''Returns true if the incoming data stream adheres to message protocol'''
 
 		header = bool((self.msg[0] == 'ARD') and (self.msg[1:(len(self.msg) - 1)] != 'ARD'))
 		trailer = bool(self.msg[len(self.msg) - 1] == '\n')
 		return header and trailer
 
-	'''Parses the incoming stream and assigns the values to instance variables'''
+	
 
 	def parseValues( self ) :
+		'''Parses the incoming stream and assigns the values to instance variables'''
 
 		lst = self.msg
 
@@ -100,9 +103,9 @@ class ArdData( serial.Serial ) :
 			pass 	# !!	
 
 
-	'''Pulls MS from data stream, normalizes the time and keeps a timer in self.millis'''
 
 	def __getMS( self ) :
+		'''Pulls MS from data stream, normalizes the time and keeps a timer in self.millis'''
 
 		k = self.msg.index('MS') + 1
 		self.millis = int(self.msg[k])
@@ -166,3 +169,31 @@ class ArdData( serial.Serial ) :
 		whose contents are the total displacement from the lap origin'''
 
 		self.lapDist = self.displacement[self.index]
+
+
+
+
+
+	def __sendMsg( self, reset = 0, valveMS = 0 ) :
+		'''Sends a message over serial to Arduino.
+
+		Includes Pi header, reset flag (only used once), and duration (ms) to open the valve.'''
+
+		msg = 'PI,RES,%d,VAL,%d,\n' % (reset, valveMS)
+		self.write(msg)
+
+	def resetARD( self ) :
+		'''Resets the Arduino and re-initializes eeverything.
+
+		Sends a message over serial with the reset flag set to one. Should only be called on 
+		startup of the Pi code.'''
+
+		self.__sendMsg(1)
+
+
+	def valveOpen( self, ms ) :
+		'''Opens the water valve for MS milliseconds.
+
+		Sends a message over serial with the length of time for the Arduino to open the valve.'''
+
+		self.__sendMsg(0, ms)

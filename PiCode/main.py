@@ -10,8 +10,10 @@ from data import ArdData 	# subclass of pySerial deals specifically with Arduino
 
 
 # Initialize communications
-ard = ArdData(115200)
+ard = ArdData(115200, 'A02')
 outfile = open('log.txt', 'w')
+
+ard.resetARD()
 
 print "ready"
 
@@ -25,7 +27,8 @@ while True :
 
 			if ard.inWaiting() :
 
-				print ard.getMsg()		# reads the stream from the Arduino into a list
+				print ard.readline()
+				#print ard.msgToList()		# reads the stream from the Arduino into a list
 
 				# ard.parseValues()
 
@@ -47,14 +50,19 @@ while True :
 
 				# # if (time.clock() - lastTime > 2) and (ard.index > 0) :
 				# if (ard.index > 1) :
-				# 	print ard.getMsg()
-				# 	print 'received to date: ', (ard.index + 1), '\n'
-
+				# 	print ard.msg
+				# 	print 'time: ', ard.time[ard.index - 2], '\n'					
+				# 	print 'received to date: ', ard.index, '\n'
 				# 	print 'velocity: ', ard.velocity[ard.index - 1], '\n'
 				# 	print 'displacement: ', ard.displacement[ard.index - 1], '\n'
 				# 	print 'position:', ard.position[ard.index - 1], '\n'
 				# 	print 'numLaps: ', ard.numLaps, '\n'
 				# 	lastTime = time.clock()
+
+			if time.clock() - lastTime > 5 :
+
+				ard.sendMsg(1)
+				lastTime = time.clock()
 
 	except OSError :
 

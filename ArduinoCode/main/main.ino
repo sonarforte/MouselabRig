@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include <avr/interrupt.h>
 #include <avr/io.h>
+#include <avr/wdt.h>
 #include "digitalWriteFast.h"
 
 extern "C" {
@@ -35,6 +36,7 @@ unsigned long msgNo = 0;
 
 volatile int currentChA = 0, currentChB = 0, prevChA, prevChB, numInts = 0;
 volatile long ticks = 0;
+volatile long foo = 0;
 
 
 
@@ -51,7 +53,7 @@ void sendSensorData( void ) {
 	
 	sendMsg = false;			// reset outgoing message flag
 	snprintf(ardMsg, 64, 
-		"ARD,N,%lu,MS,%lu,PS,%d,TKS,%d,EOL,\n", 
+		"ARD,N,%lu,MS,%lu,PS,%d,TKS,%ld,\n", 
 		msgNo, millis(), digitalReadFast(PHOTO_PIN), ticks); 
 	
 	Serial.print(ardMsg);
@@ -73,7 +75,7 @@ boolean processPiData( void ) {
 	
 		// Serial.print("Reading from Pi\n");
 
-		char s[] = ",", *token, *endptr;
+		char s[] = ",", *token, *ptr;
 		char *strptr[10];			// strptr holds pointers to each keyword in the data stream
 		int numWords = 0;
 
@@ -86,24 +88,35 @@ boolean processPiData( void ) {
 
 			strptr[numWords] = token;	// add the keyword pointer to the pointer array
 			token = strtok(NULL, s);	// find the next keyword
-			numWords++;					// increment the number of words added (NOT an index)	
 
-		}
+			if (strcmp(strptr[numWords], "RES") == 0) {
 
-		// Run through the array of words assign values to the variables
-		for(int i = 0; i < numWords; i++) {
+				long resetFlag = strtol(token, &ptr, 10);
+				// Reset the Arduino with watchdog timer
+				if (resetFlag) {
 
-			if (strcmp(strptr[i], "VALVE_MS") == 0) {
+					reset();
 
-				valveMs = strtoul(strptr[i + 1], &endptr, 10);
-				// Serial.print("valveMs assigned: ");
-				// Serial.print(valveMs);
-				// Serial.print("\n");
+				}
+
+			} else if ((strcmp(strptr[numWords], "VAL") == 0)) {
+
+				long openTime = strtol(token, &ptr, 10);
+				if (openTime) {
+
+					// valveOpen(openTime);
+					Serial.print("VAL: ");
+					Serial.print(openTime);
+					Serial.print("\n");
+				}
 
 			}
-		    
+
+			numWords++;					// increment the number of words added (NOT an index)
+
 		}
 
+		Serial.print("if nothing showed, I guess you gave me only zeros\n");
 		return true;
 
 	}
@@ -112,11 +125,25 @@ boolean processPiData( void ) {
 }
 
 
+void reset() {
+
+	
+	cli();
+	wdt_enable(WDTO_500MS);
+	while(1);
+	sei();
+
+}
+
+
 /*---------------------------------------------------------------------
 ---------------------------------------------------------------------*/
 
 
 void setup() {
+
+
+	wdt_disable();
 
 	// Configure pins
 	pinMode(PHOTO_PIN, INPUT_PULLUP);	// open pin for reading input
@@ -176,15 +203,17 @@ void loop() {
 
 	}
 
-
-
+	// sendSensorData();
+	
+	
+	
 	
 
 
-	// if (Serial.available() > 0) {
+	if (Serial.available()) {
 
-	// 	// Serial.print("data available\n");
-	// 	processPiData();
+		// Serial.print("data available\n");
+		processPiData();
 
 	// 	// if (parse) {
 
@@ -196,7 +225,7 @@ void loop() {
 
 	// 	// }
 
-	// }
+	}
 
 
 
