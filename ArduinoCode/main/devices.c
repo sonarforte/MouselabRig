@@ -6,34 +6,31 @@
 #include "devices.h"
 
 
-// Can't import "HIGH"?
-// Opens valve for ms milliseconds
-// Should use timer interrupt here or else Arduino does nothing useful while we're waiting
-void valveOpen( int ms ) {
+volatile int valveOff;
 
-	unsigned long startTime = millis();
-	digitalWrite(VALVE_PIN, HIGH);
 
-	while  (millis() - startTime < ms) {
-		
-		// Wait it out until ms time has passed 
-	
-	}
-	
-	digitalWrite(VALVE_PIN, LOW);
+// Opens valve and sets time to close it
+int valveOpen( int ms ) {
+
+	digitalWriteFast(VALVE_PIN, HIGH);
+	int timeOff = millis() + ms;
+	return timeOff;
 
 }
 
-// // Returns state of specified digital pin
-// int pinDRead( int i ) {
 
-// 	return bitRead(PIND, i);
+void valveClose( void ) {
 
-// }
+	digitalWriteFast(VALVE_PIN, LOW);
 
-// int pinDWrite( int i, int b ) {
+}
 
-// 	if (b != 0) b = 1;
-// 	bitWrite(PIND, i, b); 
+// Resets the Arduino when called through the watchdog timer
+void reset( void ) {
 
-// }
+	cli();
+	wdt_enable(WDTO_500MS);
+	while(1);
+	sei();
+
+}

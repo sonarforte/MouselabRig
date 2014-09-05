@@ -10,8 +10,7 @@
 #include <stdlib.h>
 #include <avr/interrupt.h>
 #include <avr/io.h>
-#include <avr/wdt.h>
-#include "digitalWriteFast.h"
+
 
 extern "C" {
 
@@ -24,17 +23,18 @@ extern "C" {
 
 
 
-char piMsg[64];
 
-unsigned long valveMs;		// declare all the values the Arduino needs to pull from the stream  
 unsigned long lastTime = 0;
 
-volatile boolean sendMsg = false;	// send message flag - write true if new info to send
+// volatile boolean sendMsg = false;	// send message flag - write true if new info to send
 char ardMsg[100];
 unsigned long msgNo = 0;
 
-volatile int currentChA = 0, currentChB = 0, valveOff;
+volatile int currentChA = 0, currentChB = 0;
 volatile long ticks = 0;
+volatile int valveOff;
+volatile boolean sendMsg;
+
 
 
 /*-------------------------Helper FCNs--------------------------------------------
@@ -48,7 +48,7 @@ void sendSensorData( void ) {
 	
 	// Format message string and send to Pi
 	
-	sendMsg = false;			// reset outgoing message flag
+	// sendMsg = false;			// reset outgoing message flag
 	snprintf(ardMsg, 64, 
 		"ARD,N,%lu,MS,%lu,PS,%d,TKS,%ld,\n", 
 		msgNo, millis(), digitalReadFast(PHOTO_PIN), ticks); 
@@ -66,6 +66,9 @@ void sendSensorData( void ) {
 // Returns true for valid message, false otherwise
 // Supports messages under 100 characters, with under 10 comma-separated keywords, that ends in '\n' 
 boolean processPiData( void ) {
+
+	char piMsg[64];
+
 
 	boolean proceed = Serial.readBytesUntil('\n', piMsg, 100);
 	if (proceed) {
@@ -102,7 +105,7 @@ boolean processPiData( void ) {
 				long openTime = strtol(token, &ptr, 10);
 				if (openTime) {
 
-					valveOpenTest(openTime);
+					valveOff = valveOpen(openTime);
 
 				}
 
@@ -117,30 +120,6 @@ boolean processPiData( void ) {
 	}
 
 	return false;
-}
-
-// Resets the Arduino when called through the watchdog timer
-void reset( void ) {
-
-	cli();
-	wdt_enable(WDTO_500MS);
-	while(1);
-	sei();
-
-}
-
-
-void valveOpenTest( int ms ) {
-
-	digitalWriteFast(VALVE_PIN, HIGH);
-	valveOff = millis() + ms;
-
-}
-
-void valveClose() {
-
-	digitalWriteFast(VALVE_PIN, LOW);
-
 }
 
 
@@ -192,22 +171,22 @@ void setup() {
 	TCCR1B = 0;								// set settings register B to 0
 	
 	// OCR1A = 15624;
-	// TCCR1B |= (1 << WGM12);					// turn on CTC mode (allows for variable overflow time)
+	TCCR1B |= (1 << WGM12);					// turn on CTC mode (allows for variable overflow time)
 	
 	
-	// // set 64 prescaler
-	// TCCR1B |= (1 << CS10);							
-	// TCCR1B |= (1 << CS11);
+	// // // set 64 prescaler
+	// // TCCR1B |= (1 << CS10);							
+	// // TCCR1B |= (1 << CS11);
 	
 
-	// // Set 1024 prescaler
-	// TCCR1B |= (1 << CS10);
-	// TCCR1B |= (1 << CS12);	
+	// // // Set 1024 prescaler
+	// // TCCR1B |= (1 << CS10);
+	// // TCCR1B |= (1 << CS12);	
 
-	// Set 256 prescaler
-	TCCR1B |= (1 << CS12);
+	// // Set 256 prescaler
+	// TCCR1B |= (1 << CS12);
  	
- 	TIMSK1 |= (1 << OCIE1A);				// turn on interrupt detection for timer 1
+ // 	TIMSK1 |= (1 << OCIE1A);				// turn on interrupt detection for timer 1
  	
 
 	sei();									// enable global interrupts
@@ -218,33 +197,19 @@ void setup() {
 // Main loop - Prints sensor data. Rinse and repeat
 void loop() {
 	
-	if (millis() - lastTime >= 200) {
+	if (millis() - lastTime >= 10) {
 
 		lastTime = millis();
 
-
-
-
 		sendSensorData();
-		// digitalWrite(LED_PIN, !digitalRead(LED_PIN));
-		// valveOpenTest(1);
-		// digitalWriteFast(6, HIGH);
-		// digitalWriteFast(LED_PIN, !digitalReadFast(LED_PIN));
-
-		// TIMSK1 &= ~(1 << OCIE1A);
-	}
-	// delay(500);
-	// digitalWriteFast(6, LOW);
-
-	if (Serial.available()) {
-
-		// Serial.print("data available\n");
-		processPiData();
-
 
 	}
 
-	if (millis() == valveOff) valveClose();
+	
+	if (Serial.available()) processPiData();
+
+
+	if (millis() >= valveOff) valveClose();
 
 	// if (sendMsg) sendSensorData();
 			
@@ -257,19 +222,6 @@ void loop() {
 
 // Deal with the interrupts
 
-// // ISR for INT0 (ChA) 
-// ISR(INT0_vect) {
-
-// 	// digitalWrite(LED_PIN, !digitalRead(LED_PIN));		// indicator that interrupt fired
-// 	// prevChA = currentChA;
-// 	// prevChB = currentChB;
-// 	currentChB = digitalReadFast(OPT_CHB_PIN);
-// 	currentChA = digitalReadFast(OPT_CHA_PIN);
-	
-
-// 	sendMsg = true;
-// }
-
 // ISR for INT1 (ChB)
 ISR(INT1_vect) {
 
@@ -278,20 +230,19 @@ ISR(INT1_vect) {
 	
 	if (currentChA != currentChB) ticks++;
 	else ticks--;
-	sendMsg = true;
 
 }
 
 // ISR for PCIC2 (photoPin)
 ISR(PCINT2_vect) {
 
-	// sendMsg = true; 		// dont need if send messages at predetermined intervals?
+	sendMsg = true; 		// dont need if send messages at predetermined intervals?
 
 }
 
 ISR(TIMER1_COMPA_vect) {
 
-	TCCR1B &= ~(1 << WGM12);
+	
 	Serial.println(millis());
 	digitalWriteFast(LED_PIN, !digitalReadFast(LED_PIN));
 	

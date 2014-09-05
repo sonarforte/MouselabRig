@@ -22,15 +22,16 @@ while True :
 	try :
 
 
-		lastTime = 0
+		lastTime1 = 0
+		lastTime2 = 0
 		while ard.isOpen() :
 
 			if ard.inWaiting() :
 
-				print ard.readline()
-				#print ard.msgToList()		# reads the stream from the Arduino into a list
+				# print ard.readline()
+				ard.msgToList()		# reads the stream from the Arduino into a list
 
-				# ard.parseValues()
+				ard.parseValues()
 
 				# # print 'millis: ', ard.millis
 				# # print 'photoState: ', ard.photoState
@@ -48,21 +49,21 @@ while True :
 				# # elif ard.receivedMsgs == 1000 :
 				# 	# outfile.close()
 
-				# # if (time.clock() - lastTime > 2) and (ard.index > 0) :
-				# if (ard.index > 1) :
-				# 	print ard.msg
-				# 	print 'time: ', ard.time[ard.index - 2], '\n'					
-				# 	print 'received to date: ', ard.index, '\n'
-				# 	print 'velocity: ', ard.velocity[ard.index - 1], '\n'
-				# 	print 'displacement: ', ard.displacement[ard.index - 1], '\n'
-				# 	print 'position:', ard.position[ard.index - 1], '\n'
-				# 	print 'numLaps: ', ard.numLaps, '\n'
-				# 	lastTime = time.clock()
+				# if (time.clock() - lastTime1 > 2) and (ard.index > 1) :
+				if (ard.index > 1) :
+					print ard.msg
+					print 'time: ', ard.time[ard.index - 2], '\n'					
+					print 'received to date: ', ard.index, '\n'
+					print 'velocity: ', ard.velocity[ard.index - 1], '\n'
+					print 'displacement: ', ard.displacement[ard.index - 1], '\n'
+					print 'position:', ard.position[ard.index - 1], '\n'
+					print 'numLaps: ', ard.numLaps, '\n'
+				# lastTime1 = time.clock()
 
-			if time.clock() - lastTime > 5 :
+			# if time.clock() - lastTime2 > 5 :
 
-				ard.valveOpen(500)
-				lastTime = time.clock()
+			# 	ard.valveOpen(500)
+			# 	lastTime2 = time.clock()
 
 	except OSError :
 

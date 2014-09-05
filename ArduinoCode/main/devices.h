@@ -11,6 +11,8 @@
 #include <Arduino.h>
 #include <avr/interrupt.h>
 #include <avr/io.h>
+#include <avr/wdt.h>
+#include "digitalWriteFast.h"
 
 #define PHOTO_PIN 	5
 #define VALVE_PIN 	6
@@ -22,13 +24,20 @@
 #define A02			500
 #define C02			100
 
-// Opens valve for ms milliseconds
-void valveOpen( int ms );
 
-// // Returns state of input pin i from 0 to 7
-// int pinDRead( int i );
 
-// // Writes 0 or 1 to pin i from 0 to 7
-// int pinDWrite( int i, int b );
+
+
+
+// Opens valve and sets closing time ms milliseconds later
+int valveOpen( int ms );
+
+// Closes the valve (called from main() after valveOff time has expired)
+void valveClose( void ); 
+
+// Resets the Arduino from software (should only be called from Pi at program start)
+void reset( void );
+
+
 
 #endif
