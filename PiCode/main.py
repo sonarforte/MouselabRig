@@ -59,9 +59,9 @@ while True :
 				# 	print 'numLaps: ', ard.numLaps, '\n'
 				# 	lastTime = time.clock()
 
-			if time.clock() - lastTime > 10 :
+			if time.clock() - lastTime > 5 :
 
-				ard.valveOpen(2000)
+				ard.valveOpen(500)
 				lastTime = time.clock()
 
 	except OSError :

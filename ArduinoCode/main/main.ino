@@ -33,7 +33,7 @@ volatile boolean sendMsg = false;	// send message flag - write true if new info 
 char ardMsg[100];
 unsigned long msgNo = 0;
 
-volatile int currentChA = 0, currentChB = 0;
+volatile int currentChA = 0, currentChB = 0, valveOff;
 volatile long ticks = 0;
 
 
@@ -103,7 +103,7 @@ boolean processPiData( void ) {
 				if (openTime) {
 
 					valveOpenTest(openTime);
-					Serial.print("got ms\n");
+
 				}
 
 			}
@@ -120,7 +120,7 @@ boolean processPiData( void ) {
 }
 
 // Resets the Arduino when called through the watchdog timer
-void reset() {
+void reset( void ) {
 
 	cli();
 	wdt_enable(WDTO_500MS);
@@ -130,26 +130,16 @@ void reset() {
 }
 
 
-void valveOpenTest(int ms) {
+void valveOpenTest( int ms ) {
 
+	digitalWriteFast(VALVE_PIN, HIGH);
+	valveOff = millis() + ms;
 
-	TCNT1  = 0;				// reset counter to 0
-	OCR1A = 31249;			// .5 seconds with 256 prescaler
-	TCCR1B |= (1 << WGM12);					// turn on CTC mode
-	Serial.print("valveOpen\n");
-	digitalWriteFast(LED_PIN, !digitalReadFast(LED_PIN));
-	// digitalWrite(LED_PIN, !digitalRead(LED_PIN));
-	// cli();
-	// OCR1A = (ms * 250) - 1;
-	// OCR1A = s * 15625 - 1;
-	// OCR1A = 15624;
-				// one second with 64 prescaler
+}
 
-	// ms = ms / 1000;
-	// OCR1A = ms * 15625 - 1;
+void valveClose() {
 
-	// TIMSK1 |= (1 << OCIE1A);
-	// sei();
+	digitalWriteFast(VALVE_PIN, LOW);
 
 }
 
@@ -254,13 +244,10 @@ void loop() {
 
 	}
 
+	if (millis() == valveOff) valveClose();
+
 	// if (sendMsg) sendSensorData();
 			
-
-	// digitalWriteFast(6, HIGH);
-	// delay(200);
-	// digitalWriteFast(6, LOW);
-	// delay(1000);
 
 }
 
