@@ -182,6 +182,7 @@ class ArdData( serial.Serial ) :
 		msg = 'PI,RES,%d,VAL,%d,\n' % (reset, valveMS)
 		self.write(msg)
 
+	
 	def resetARD( self ) :
 		'''Resets the Arduino and re-initializes eeverything.
 
