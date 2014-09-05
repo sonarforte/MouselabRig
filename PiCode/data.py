@@ -128,12 +128,12 @@ class ArdData( serial.Serial ) :
 		self.photoState = int(self.msg[k])
 
 		# Incrememnt numLaps every time the sensor changes from 0 to 1
-		if (psOld == 0) and (self.photoState == 1) and (self.index > 10) :
+		if (psOld == 0) and (self.photoState == 1) and (self.index > 20) :
 			avgVel = 0
-			for j in range(self.index - 10, self.index) :
+			for j in range(self.index - 20, self.index) :
 				avgVel += self.velocity[j]
 			# Only counts a lap if the belt is moving forward
-			if (avgVel / 10) > 0:
+			if (avgVel / 20) > 0:
 				self.numLaps += 1
 				self.__resetPosition()
 
@@ -174,23 +174,23 @@ class ArdData( serial.Serial ) :
 
 
 
-	def __sendMsg( self, reset = 0, valveMS = 0 ) :
+	def __sendMsg( self, moreData = 0, valveMS = 0, reset = 0 ) :
 		'''Sends a message over serial to Arduino.
 
-		Includes Pi header, reset flag (only used once), and duration (ms) to open the valve.'''
+		Includes Pi header, reset flag (only used once), and duration (ms) to open the valve.
+		If moreData != 0, valveMS and reset flags will not be set on the Arduino. 
+		Only call with moreData = 1 if no other information needs to be sent.'''
 
-		msg = 'PI,RES,%d,VAL,%d,\n' % (reset, valveMS)
+		msg = 'PI,MORE,%d,VAL,%d,RES,%d,\n' % (moreData, valveMS, reset)
 		self.write(msg)
 
-	
-	def resetARD( self ) :
-		'''Resets the Arduino and re-initializes eeverything.
+	def msgRequest( self ) :
+		'''Tells the Arduino to send new data.
 
-		Sends a message over serial with the reset flag set to one. Should only be called on 
-		startup of the Pi code.'''
+		Sends a message over serial after the current data stream has been processed and
+		the processor has been freed up for more data.'''
 
-		self.__sendMsg(1)
-
+		self.__sendMsg(1);
 
 	def valveOpen( self, ms ) :
 		'''Opens the water valve for MS milliseconds.
@@ -198,3 +198,18 @@ class ArdData( serial.Serial ) :
 		Sends a message over serial with the length of time for the Arduino to open the valve.'''
 
 		self.__sendMsg(0, ms)
+		print '                                   message sent to open valve ', ms, '\n'
+
+
+	def resetARD( self ) :
+		'''Resets the Arduino and re-initializes eeverything.
+
+		Sends a message over serial with the reset flag set to one. Should only be called on 
+		startup of the Pi code.'''
+
+		self.__sendMsg(0, 0, 1)
+
+
+	
+
+	

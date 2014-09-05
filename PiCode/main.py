@@ -26,6 +26,8 @@ while True :
 		lastTime2 = 0
 		while ard.isOpen() :
 
+			ard.msgRequest()
+
 			if ard.inWaiting() :
 
 				# print ard.readline()
@@ -49,7 +51,7 @@ while True :
 				# # elif ard.receivedMsgs == 1000 :
 				# 	# outfile.close()
 
-				# if (time.clock() - lastTime1 > 2) and (ard.index > 1) :
+				# if (time.clock() - lastTime1 > 1) and (ard.index > 1) :
 				if (ard.index > 1) :
 					print ard.msg
 					print 'time: ', ard.time[ard.index - 2], '\n'					
@@ -58,12 +60,13 @@ while True :
 					print 'displacement: ', ard.displacement[ard.index - 1], '\n'
 					print 'position:', ard.position[ard.index - 1], '\n'
 					print 'numLaps: ', ard.numLaps, '\n'
-				# lastTime1 = time.clock()
+					lastTime1 = time.clock()
 
-			# if time.clock() - lastTime2 > 5 :
+			if time.clock() - lastTime2 > 3 :
 
-			# 	ard.valveOpen(500)
-			# 	lastTime2 = time.clock()
+				print 'want to open valve\n'
+				ard.valveOpen(1000)
+				lastTime2 = time.clock()
 
 	except OSError :
 
