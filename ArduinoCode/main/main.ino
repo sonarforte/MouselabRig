@@ -8,9 +8,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <avr/interrupt.h>
-#include <avr/io.h>
-
 
 extern "C" {
 
@@ -32,7 +29,8 @@ unsigned long msgNo = 0;
 volatile int currentChA = 0, currentChB = 0, photoState, valveState = 0;
 volatile long ticks = 0;
 volatile boolean sendMsg = true;
-unsigned long closeTime; 
+unsigned long closeTime = 0; 
+
 
 /*-------------------------Helper FCNs--------------------------------------------
 --------------------------------------------------------------------------------*/
@@ -47,7 +45,7 @@ void sendSensorData( void ) {
 	snprintf(ardMsg, 64, 
 		"ARD,N,%lu,MS,%lu,PS,%d,TKS,%ld,VAL,%d,\n", 
 		msgNo, millis(), photoState, ticks, valveState); 
-	
+	while(Serial.available()) Serial.read();
 	Serial.print(ardMsg);
 	msgNo++;
 	sendMsg = false;			// reset outgoing message flag
@@ -78,22 +76,21 @@ void processPiData( void ) {
 			strptr[numWords] = token;	// add the keyword pointer to the pointer array
 			token = strtok(NULL, s);	// find the next keyword
 
-			if (strcmp(strptr[numWords], "MORE") == 0) {
-
-				long moreData = strtol(token, &ptr, 10);
-				if (moreData) {
-
-					sendMsg = true;
-					return;
-
-				}
-			
-			} else if ((strcmp(strptr[numWords], "VAL") == 0)) {
+			if ((strcmp(strptr[numWords], "VAL") == 0)) {
 
 				long openTime = strtol(token, &ptr, 10);
 				if (openTime) {
 
 					closeTime = valveOpen(openTime);
+					sendMsg = true;
+					return;
+				}
+			
+			} else if (strcmp(strptr[numWords], "MORE") == 0) {
+
+				long moreData = strtol(token, &ptr, 10);
+				if (moreData) {
+
 					sendMsg = true;
 					return;
 				}
@@ -119,76 +116,73 @@ void processPiData( void ) {
 /*-----------------------Setup & Main----------------------------------------------
 ---------------------------------------------------------------------------------*/
 
-
+/* Setup routine. Run once upon Arduino startup and contains configuration settings 
+for the hardware on the chip and boar. Initializes pins for I/O and sets up  interrupts. */
 void setup() {
 
+	// Disable watchdog timer (used for software reset in devices.c)
+	wdt_disable();						
 
-	wdt_disable();
+	// Configure pins for digital I/O
+	pinMode(PHOTO_PIN, INPUT_PULLUP);	// open pin for photo sensor as input
+	pinMode(VALVE_PIN, OUTPUT);			// open pin attached to relay 1 (controls the valve)
+	pinMode(LED_PIN, OUTPUT);			// open builtin LED (pin 13) for visual feedback
+	// pinMode(8, OUTPUT);					// open second LED
+	pinMode(OPT_CH1_PIN, INPUT);		// open pin for encoder Ch1
+	pinMode(OPT_CHA_PIN, INPUT);		// open pin for encoder ChA
+	pinMode(OPT_CHB_PIN, INPUT);		// open pin for encoder ChB
 
-	// Configure pins
-	pinMode(PHOTO_PIN, INPUT_PULLUP);	// open pin for reading input
-	pinMode(6, OUTPUT);			// open pin attached to relay board
-	pinMode(LED_PIN, OUTPUT);			// open LED for visual feedback
-	
-	// Open optical encoder pins
-	pinMode(OPT_CH1_PIN, INPUT);
-	pinMode(OPT_CHA_PIN, INPUT);
-	pinMode(OPT_CHB_PIN, INPUT);
-
-
-	Serial.begin(115200);					// initialize serial data stream
+	// Initialize serial data stream between Arduino and Pi
+	Serial.begin(115200);				
 	
 	// Configure interrupts
-	
-	cli();
+	cli();								// shut off global interrupts
 
-	// Optical enncoder ChB interrupt
-	EIMSK |= (1 << INT1);					// enable external interrupt INT1 (I/O pin 3)
-	EICRA |= (1 <<ISC10);					// trigger INT1 on a logical change
+	// Configure INT1 interrupt register settings for encoder ChB
+	EIMSK |= (1 << INT1);				// enable external interrupt INT1 (I/O pin 3)
+	EICRA |= (1 <<ISC10);				// trigger INT1 on a logical change
 
+	// Configure PCIE2 interrupt register settings for photo sensor
+	PCICR |= (1 << PCIE2);				// enable Pin Change Interrupt 2 (AVR pins 23-16)
+	PCMSK2 |= (1 << PCINT21);			// enable PCICR on AVR PD5 (I/O pin 5) 
 
-	// Photo sensor interrupt
-	PCICR |= (1 << PCIE2);					// enable Pin Change Interrupt 2 (AVR pins 23-16)
-	PCMSK2 |= (1 << PCINT21);				// enable PCIR on AVR PD5 (I/O pin 5) 
- 	
-
-	sei();									// enable global interrupts
+	sei();								// enable global interrupts
 
 }
 
 
-// Main loop - Prints sensor data. Rinse and repeat
+/* Main loop. Sends sensor data if Pi has requested a new message. 
+If no message is to be sent, checks for incoming serial data and processes it.
+Shuts off the valve at the end of the loop if its open duration has expired. */
 void loop() {
 	
-	// if (millis() - lastTime >= 10) {
-
-	// 	lastTime = millis();
-
-	// 	sendSensorData();
-
-	// }
-
-	
-	// if (Serial.available()) {
-
-	// 	processPiData();
-
-	// }
-	
+	/* Send new data if it's Arduino's turn to message Pi	
+	zTest the sendMsg flag (only set upon successful parsing by processPiData()) */
 	if (sendMsg) {
-	
-		sendSensorData();
+		
+		/* Send the most recent sensor values which have been updated 
+		in the background by interrupts */
+		sendSensorData();		
 
+	/* Check for new data if it is not Arduino's turn to send a new message. If there is, parse
+	and process (checking only to open the valve, send new data, or reset) */
 	} else if (Serial.available()) {
 
+		/* Checks for a command to open the valve and opens it (setting closeTime in the process)
+		If not, then Arduino is ready to send a reply back to Pi */
 		processPiData();
 
 	}
 	
-	if (millis() >= closeTime) {
+	/* Shuts off the valve after the requested time has elapsed. Executes valveClose() only if 
+	the valve is currently on and closeTime (set by valveOpen()) has been reached. */
+	if (valveState) {
+		if (millis() >= closeTime) {
 
-		valveClose();
+			valveClose();		// closes the valve and sets valveState to zero
 
+		}
+	
 	}
 
 }

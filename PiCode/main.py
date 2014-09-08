@@ -16,77 +16,78 @@ outfile = open('log.txt', 'w')
 ard.resetARD()
 
 print "Firing up the Arduino"
-# for i in range(5) :
-# 	print '.'
-# 	time.sleep(.5)
 
 
 print "ready"
 
-while True :
+cnt = 0
+lastTime1 = 0
+lastTime2 = 0
+while ard.isOpen() :
 
 	try :
+		
+		ard.msgRequest()
 
-		sendMsg = False
-		lastTime1 = 0
-		lastTime2 = 0
-		while ard.isOpen() :
+		if ard.inWaiting() :
 
-			if sendMsg :
-				ard.msgRequest()
-				sendMsg = False
+			# lst = ard.readline()
+			# if lst[0] != 'A' :
+			# 	print lst
 
-			elif ard.inWaiting() :
+			print ard.readline()
 
-				print ard.readline()
-				# ard.msgToList()		# reads the stream from the Arduino into a list
+			# ard.msgToList()		# reads the stream from the Arduino into a list
 
-				# ard.parseValues()
+			# ard.parseValues()
 
-				# # print 'millis: ', ard.millis
-				# # print 'photoState: ', ard.photoState
-				# # print 'numLaps: ', ard.numLaps
-				# # print 'ChA: ', ard.chA
-				# # print 'ChB: ', ard.chB
-
-				# # dataline = "PI,N,%d,MS,%d,PS,%d,NL,%d,CHA,%d,CHB,%d,\n" % (ard.receivedMsgs, 
-				# 		# ard.millis, ard.photoState, ard.numLaps, ard.chA, ard.chB)
-
-				
-
-				# # if ard.receivedMsgs < 1000 :
-				# 	# outfile.write(dataline)
-				# # elif ard.receivedMsgs == 1000 :
-				# 	# outfile.close()
-
-				# if (time.clock() - lastTime1 > 1) and (ard.index > 1) :
-				# if (ard.index > 1) :
-				# 	print ard.msg
-				# 	print 'time: ', ard.time[ard.index - 2], '\n'					
-				# 	print 'received to date: ', ard.index, '\n'
-				# 	print 'velocity: ', ard.velocity[ard.index - 1], '\n'
-				# 	print 'displacement: ', ard.displacement[ard.index - 1], '\n'
-				# 	print 'position:', ard.position[ard.index - 1], '\n'
-				# 	print 'numLaps: ', ard.numLaps, '\n'
-				# 	lastTime1 = time.clock()
-				sendMsg = True
+			
+			# # dataline = "PI,N,%d,MS,%d,PS,%d,NL,%d,CHA,%d,CHB,%d,\n" % (ard.receivedMsgs, 
+			# 		# ard.millis, ard.photoState, ard.numLaps, ard.chA, ard.chB)
 
 			
 
+			# # if ard.receivedMsgs < 1000 :
+			# 	# outfile.write(dataline)
+			# # elif ard.receivedMsgs == 1000 :
+			# 	# outfile.close()
 
-			# if time.clock() - lastTime2 > 3 :
+			# if (time.clock() - lastTime1 > 1) and (ard.index > 1) :
+			
+			# print ard.msg
+			# print 'time:             ', ard.time[ard.index - 1]	
+			# if (ard.index > 1) :						
+			# 	print 'received to date: ', ard.index
+			# 	print 'velocity:         ', ard.velocity[ard.index - 1]
+			# 	print 'displacement:     ', ard.displacement[ard.index - 1]
+			# 	print 'position:         ', ard.position[ard.index - 1]
+			# 	print 'acceleration:     ', ard.acceleration[ard.index - 1]
+			# 	print 'numLaps:          ', ard.numLaps, '\n'
+			# 	lastTime1 = time.clock()
 
-			# 	print 'want to open valve\n'
-			# 	ard.valveOpen(1000)
-			# 	lastTime2 = time.clock()
+			ard.sendMsg = True
+			
+
+		# print 'yo'
+		
+		# if time.clock() - lastTime2 > 1 :
+		if (cnt % 500000 == 0) and (cnt > 10) :
+
+			print 'want to open valve'
+			ard.valveOpen(300)
+			lastTime2 = time.clock()
+
+		cnt += 1
+
+		
 
 	except OSError :
 
 		print "Why is there an OSError? Possibly because you reset the Arduino?"
+		time.sleep(2)
 	
 	except IOError :
 
 		print "Plug the Arduino back in"
 		time.sleep(2)
 
-print "end loop"

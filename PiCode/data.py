@@ -16,7 +16,6 @@ class ArdData( serial.Serial ) :
 	def __init__( self, rate, enc = 'A02' ) :
 		
 		self.sentMsgs = 0
-
 		self.startTime = 0
 		self.time = []
 		self.photoState = 0
@@ -26,10 +25,14 @@ class ArdData( serial.Serial ) :
 		self.displacement = []			# list contains linear displacement (time component in millis)
 		self.position = []				# list contains linear position in current lap
 		self.velocity = []			# list contains linear velocity
+		self.acceleration = []
+		self.valveState = []
 		self.radius = 5 		# wheel radius is 5 cm
 		self.revs = 0
 		self.index = 0			# number of messages received
 		self.lapDist = 0
+		self.sendMsg = False
+		self.valveOpenTime = 0
 		if enc == 'A02' :
 			self.ppr = 500
 		elif enc == 'C02' :
@@ -78,6 +81,8 @@ class ArdData( serial.Serial ) :
 
 	def parseValues( self ) :
 		'''Parses the incoming stream and assigns the values to instance variables'''
+		if not self.msg :
+			self.msgToList()
 
 		lst = self.msg
 
@@ -146,7 +151,7 @@ class ArdData( serial.Serial ) :
 	def __getENC( self ) :
 		'''Does math on net encoder ticks. 
 
-		Finds revolutions, total displacement, and instantaneous velocity'''
+		Finds revolutions, total displacement, instantaneous velocity, and acceleration'''
 		k = self.msg.index('TKS') + 1
 		ticks = float(self.msg[k])
 		
@@ -158,16 +163,20 @@ class ArdData( serial.Serial ) :
 		self.position.append(disp - self.lapDist)
 		if i == 0 :
 			self.velocity.append(0)
+			self.acceleration.append(0)
 		else :
-			self.velocity.append((1000 * (self.displacement[i] - self.displacement[i - 1]) / 
-								   (self.time[i] - self.time[i - 1])))
+			dt = (self.time[i] - self.time[i - 1])
+			self.velocity.append(1000 * (self.displacement[i] - self.displacement[i - 1]) / dt)
+			self.acceleration.append((self.velocity[i] - self.velocity[i - 1]) / dt)
 
 
-	# def __getVAL( self ) :
-	# 	'''Finds state of the valve.
+	def __getVAL( self ) :
+		'''Finds state of the valve.
 
-	# 	Pulls value from stream and appends it to a list.'''
-	# 	pass
+		Pulls value from stream and appends it to a list.'''
+		k = self.msg.index('VAL') + 1
+		val = int(self.msg[k])
+		self.valveState.append(val)
 
 
 	def __resetPosition( self ) :
@@ -182,15 +191,16 @@ class ArdData( serial.Serial ) :
 
 
 
-	def __sendMsg( self, moreData = 0, valveMS = 0, reset = 0 ) :
+	def __sendMsg( self, valveMS = 0, moreData = 0,  reset = 0 ) :
 		'''Sends a message over serial to Arduino.
 
 		Includes Pi header, reset flag (only used once), and duration (ms) to open the valve.
 		If moreData != 0, valveMS and reset flags will not be set on the Arduino. 
 		Only call with moreData = 1 if no other information needs to be sent.'''
 
-		msg = 'PI,MORE,%d,VAL,%d,RES,%d,\n' % (moreData, valveMS, reset)
+		msg = 'PI,VAL,%d,MORE,%d,RES,%d,\n' % (valveMS, moreData, reset)
 		self.write(msg)
+		self.sendMsg = False
 
 	def msgRequest( self ) :
 		'''Tells the Arduino to send new data.
@@ -198,15 +208,24 @@ class ArdData( serial.Serial ) :
 		Sends a message over serial after the current data stream has been processed and
 		the processor has been freed up for more data.'''
 
-		self.__sendMsg(1);
+		self.flushOutput()
+		if self.sendMsg :
+			if self.valveOpenTime :
+				self.__sendMsg(self.valveOpenTime, 1)
+				self.valveOpenTime = 0
+			
+			else :
+				self.__sendMsg(0, 1)
+
+
 
 	def valveOpen( self, ms ) :
 		'''Opens the water valve for MS milliseconds.
 
 		Sends a message over serial with the length of time for the Arduino to open the valve.'''
 
-		self.__sendMsg(0, ms)
-		print '                                   message sent to open valve ', ms, '\n'
+		self.valveOpenTime = ms
+		print 'valveopen = ms'
 
 
 	def resetARD( self ) :
@@ -215,7 +234,8 @@ class ArdData( serial.Serial ) :
 		Sends a message over serial with the reset flag set to one. Should only be called on 
 		startup of the Pi code.'''
 
-		self.__sendMsg(0, 0, 1)
+		# Emergency command-- does not need self.sendMsg to be true 
+		self.__sendMsg(0, 0, 1)		
 
 
 	

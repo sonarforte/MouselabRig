@@ -13,6 +13,8 @@
 #include <avr/io.h>
 #include <avr/wdt.h>
 #include "digitalWriteFast.h"
+#include <avr/interrupt.h>
+#include <avr/io.h>
 
 #define PHOTO_PIN 	5
 #define VALVE_PIN 	6
@@ -30,7 +32,7 @@
 
 
 // Opens valve and sets closing time ms milliseconds later
-int valveOpen( int ms );
+unsigned long valveOpen( int ms );
 
 // Closes the valve (called from main() after valveOff time has expired)
 void valveClose( void ); 
