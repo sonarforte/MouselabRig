@@ -94,6 +94,9 @@ class ArdData( serial.Serial ) :
 			if 'PS' in lst :
 				self.__getPS()
 
+			# if 'VAL' in lst :
+			# 	self.__getVAL()
+
 			
 
 			self.index += 1			# update message index number
@@ -160,6 +163,11 @@ class ArdData( serial.Serial ) :
 								   (self.time[i] - self.time[i - 1])))
 
 
+	# def __getVAL( self ) :
+	# 	'''Finds state of the valve.
+
+	# 	Pulls value from stream and appends it to a list.'''
+	# 	pass
 
 
 	def __resetPosition( self ) :

@@ -29,7 +29,7 @@ unsigned long lastTime = 0;
 char ardMsg[100];
 unsigned long msgNo = 0;
 
-volatile int currentChA = 0, currentChB = 0, photoState;
+volatile int currentChA = 0, currentChB = 0, photoState, valveState = 0;
 volatile long ticks = 0;
 volatile boolean sendMsg;
 unsigned long closeTime; 

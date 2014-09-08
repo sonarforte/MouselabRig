@@ -7,7 +7,7 @@
 
 
 volatile int valveOff;
-
+extern volatile int valveState;
 
 // Opens valve and sets time to close it
 int valveOpen( int ms ) {
@@ -15,6 +15,7 @@ int valveOpen( int ms ) {
 	digitalWriteFast(LED_PIN, !digitalReadFast(LED_PIN));
 	digitalWriteFast(VALVE_PIN, HIGH);
 	int timeOff = millis() + ms;
+	valveState = 1;
 	return timeOff;
 
 }
@@ -23,6 +24,7 @@ int valveOpen( int ms ) {
 void valveClose( void ) {
 
 	digitalWriteFast(VALVE_PIN, LOW);
+	valveState = 0;
 
 }
 

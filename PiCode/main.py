@@ -15,6 +15,12 @@ outfile = open('log.txt', 'w')
 
 ard.resetARD()
 
+print "Firing up the Arduino"
+for i in range(5) :
+	print '.'
+	time.sleep(.5)
+
+
 print "ready"
 
 while True :
@@ -62,11 +68,11 @@ while True :
 					print 'numLaps: ', ard.numLaps, '\n'
 					lastTime1 = time.clock()
 
-			if time.clock() - lastTime2 > 3 :
+			# if time.clock() - lastTime2 > 3 :
 
-				print 'want to open valve\n'
-				ard.valveOpen(1000)
-				lastTime2 = time.clock()
+			# 	print 'want to open valve\n'
+			# 	ard.valveOpen(1000)
+			# 	lastTime2 = time.clock()
 
 	except OSError :
 
