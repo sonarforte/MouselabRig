@@ -71,11 +71,11 @@ while ard.isOpen() :
 		# print 'yo'
 		
 		# if time.clock() - lastTime2 > 1 :
-		if (cnt % 500000 == 0) and (cnt > 10) :
+		if ard.laps[ard.index - 1] > ard.laps[ard.index - 2] :
 
-			print 'want to open valve'
+			
 			ard.valveOpen(300)
-			lastTime2 = time.clock()
+			# lastTime2 = time.clock()
 
 		cnt += 1
 
