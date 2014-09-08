@@ -16,9 +16,9 @@ outfile = open('log.txt', 'w')
 ard.resetARD()
 
 print "Firing up the Arduino"
-for i in range(5) :
-	print '.'
-	time.sleep(.5)
+# for i in range(5) :
+# 	print '.'
+# 	time.sleep(.5)
 
 
 print "ready"
@@ -27,19 +27,21 @@ while True :
 
 	try :
 
-
+		sendMsg = False
 		lastTime1 = 0
 		lastTime2 = 0
 		while ard.isOpen() :
 
-			ard.msgRequest()
+			if sendMsg :
+				ard.msgRequest()
+				sendMsg = False
 
-			if ard.inWaiting() :
+			elif ard.inWaiting() :
 
-				# print ard.readline()
-				ard.msgToList()		# reads the stream from the Arduino into a list
+				print ard.readline()
+				# ard.msgToList()		# reads the stream from the Arduino into a list
 
-				ard.parseValues()
+				# ard.parseValues()
 
 				# # print 'millis: ', ard.millis
 				# # print 'photoState: ', ard.photoState
@@ -58,15 +60,19 @@ while True :
 				# 	# outfile.close()
 
 				# if (time.clock() - lastTime1 > 1) and (ard.index > 1) :
-				if (ard.index > 1) :
-					print ard.msg
-					print 'time: ', ard.time[ard.index - 2], '\n'					
-					print 'received to date: ', ard.index, '\n'
-					print 'velocity: ', ard.velocity[ard.index - 1], '\n'
-					print 'displacement: ', ard.displacement[ard.index - 1], '\n'
-					print 'position:', ard.position[ard.index - 1], '\n'
-					print 'numLaps: ', ard.numLaps, '\n'
-					lastTime1 = time.clock()
+				# if (ard.index > 1) :
+				# 	print ard.msg
+				# 	print 'time: ', ard.time[ard.index - 2], '\n'					
+				# 	print 'received to date: ', ard.index, '\n'
+				# 	print 'velocity: ', ard.velocity[ard.index - 1], '\n'
+				# 	print 'displacement: ', ard.displacement[ard.index - 1], '\n'
+				# 	print 'position:', ard.position[ard.index - 1], '\n'
+				# 	print 'numLaps: ', ard.numLaps, '\n'
+				# 	lastTime1 = time.clock()
+				sendMsg = True
+
+			
+
 
 			# if time.clock() - lastTime2 > 3 :
 

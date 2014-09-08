@@ -31,7 +31,7 @@ unsigned long msgNo = 0;
 
 volatile int currentChA = 0, currentChB = 0, photoState, valveState = 0;
 volatile long ticks = 0;
-volatile boolean sendMsg;
+volatile boolean sendMsg = true;
 unsigned long closeTime; 
 
 /*-------------------------Helper FCNs--------------------------------------------
@@ -45,8 +45,8 @@ void sendSensorData( void ) {
 	// Format message string and send to Pi
 	
 	snprintf(ardMsg, 64, 
-		"ARD,N,%lu,MS,%lu,PS,%d,TKS,%ld,\n", 
-		msgNo, millis(), photoState, ticks); 
+		"ARD,N,%lu,MS,%lu,PS,%d,TKS,%ld,VAL,%d,\n", 
+		msgNo, millis(), photoState, ticks, valveState); 
 	
 	Serial.print(ardMsg);
 	msgNo++;
@@ -84,14 +84,19 @@ void processPiData( void ) {
 				if (moreData) {
 
 					sendMsg = true;
-					// return;
+					return;
 
 				}
 			
 			} else if ((strcmp(strptr[numWords], "VAL") == 0)) {
 
 				long openTime = strtol(token, &ptr, 10);
-				if (openTime) closeTime = valveOpen(openTime);
+				if (openTime) {
+
+					closeTime = valveOpen(openTime);
+					sendMsg = true;
+					return;
+				}
 
 			} else if (strcmp(strptr[numWords], "RES") == 0) {
 
@@ -164,15 +169,19 @@ void loop() {
 	// }
 
 	
-	if (Serial.available()) {
+	// if (Serial.available()) {
 
-		processPiData();
+	// 	processPiData();
 
-	}
+	// }
 	
 	if (sendMsg) {
 	
 		sendSensorData();
+
+	} else if (Serial.available()) {
+
+		processPiData();
 
 	}
 	
