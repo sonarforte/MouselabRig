@@ -1,20 +1,22 @@
 #!/usr/bin/python
-# comm.py
+# data.py
 # Defines the comm class for communications with Arduino
 # Steven Rofrano
 # 2014-08-07
 
 import serial
 import math
+from parameters import Cons, Vars
 
 
 class ArdData( serial.Serial ) :
 	
-	'''Finds the correct port and initializes serial communication at baudrate "rate"
-	Takes the name of the encoder as a string for motion calculations'''
+	
 	 
 	def __init__( self, rate, enc = 'A02' ) :
-		
+		'''Finds the correct port and initializes serial communication at baudrate "rate"
+		Takes the name of the encoder as a string for motion calculations'''
+
 		self.sentMsgs = 0
 		self.startTime = 0
 		self.time = []
@@ -27,16 +29,11 @@ class ArdData( serial.Serial ) :
 		self.velocity = []			# list contains linear velocity
 		self.acceleration = []
 		self.valveState = []
-		self.radius = 5 		# wheel radius is 5 cm
 		self.revs = 0
 		self.index = 0			# number of messages received
 		self.lapDist = 0
 		self.sendMsg = False
 		self.valveOpenTime = 0
-		if enc == 'A02' :
-			self.ppr = 500
-		elif enc == 'C02' :
-			self.ppr = 100
 
 
 		super(ArdData, self).__init__(baudrate = rate)
@@ -81,7 +78,7 @@ class ArdData( serial.Serial ) :
 
 	def parseValues( self ) :
 		'''Parses the incoming stream and assigns the values to instance variables'''
-		if not self.msg :
+		if not hasattr(ArdData, 'msg') :
 			self.msgToList()
 
 		lst = self.msg
@@ -136,14 +133,11 @@ class ArdData( serial.Serial ) :
 		self.photoState = int(self.msg[k])
 
 		# Incrememnt numLaps every time the sensor changes from 0 to 1
-		if (psOld == 0) and (self.photoState == 1) and (self.index > 20) :
-			avgVel = 0
-			for j in range(self.index - 20, self.index) :
-				avgVel += self.velocity[j]
-			# Only counts a lap if the belt is moving forward
-			if (avgVel / 20) > 0:
+		if (psOld == 0) and (self.photoState == 1) :			
+			# Only counts a lap if the mouse has completed >80 % of a lap
+			if self.position[self.index] > .8 * Cons.belt_length :
 				self.numLaps += 1
-				self.__resetPosition()
+			self.__resetPosition()
 
 		self.laps.append(self.numLaps)
 
@@ -157,8 +151,8 @@ class ArdData( serial.Serial ) :
 		
 		i = self.index
 
-		self.revs = ticks / (2 * self.ppr)
-		disp = 2 * math.pi * self.radius * self.revs
+		self.revs = ticks / (2 * Vars.encoderPPR)
+		disp = 2 * math.pi * Cons.wheel_radius * self.revs
 		self.displacement.append(disp)
 		self.position.append(disp - self.lapDist)
 		if i == 0 :
@@ -225,7 +219,7 @@ class ArdData( serial.Serial ) :
 		Sends a message over serial with the length of time for the Arduino to open the valve.'''
 
 		self.valveOpenTime = ms
-		print 'valveopen = ms'
+		# print 'valveopen = ms'
 
 
 	def resetARD( self ) :

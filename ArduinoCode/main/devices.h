@@ -26,11 +26,6 @@
 #define A02			500
 #define C02			100
 
-
-
-
-
-
 // Opens valve and sets closing time ms milliseconds later
 unsigned long valveOpen( int ms );
 
