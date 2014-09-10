@@ -3,7 +3,7 @@
 # Steven Rofrano
 # 2014-09-09
 
-class Cons :
+class Cons:
 
 	'''Defines numerical constants for use as parameters and arguments in MouselabRig.
 
@@ -17,7 +17,7 @@ class Cons :
 	belt_length = 137 			# circumfrence of belt (cm)
 
 
-class Vars :
+class Vars:
 
 	'''Defines all the variables that determine the conditional reward system.
 
@@ -51,7 +51,7 @@ class Vars :
 	
 	experimenterInitials = 'SR'						# your initials (as a string)			
 	mouseName = 'Jerry'								# name of your mouse (as a string)
-	virtualLapLength = 140							# length of virtual lap (cm)
+	virtualLapLength = 100							# length of virtual lap (cm)
 	valveOpenMillis = 100							# amount of time to open valve (ms)
 	# Path to save log files on different computers
 	logPathPi = '/home/pi/'				 
