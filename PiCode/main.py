@@ -29,9 +29,6 @@ ard.resetARD()
 
 print "ready"
 
-
-
-
 lastTime1 = 0
 lastTime2 = 0
 while ard.isOpen() :
@@ -41,7 +38,7 @@ while ard.isOpen() :
 		ard.msgRequest()
 
 		if ard.inWaiting() :
-
+			# print "INWAITING"
 			# lst = ard.readline()
 			# if lst[0] != 'A' :
 			# 	print lst

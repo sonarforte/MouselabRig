@@ -43,6 +43,7 @@ class Vars :
 	# Which computer are you running Mouselabrig from?
 	computerType = 'Linux'
 	# computerType = 'Pi'
+	# computerType = 'Mac'
 	
 	
 	# Variable-Choice Variables

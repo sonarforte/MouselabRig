@@ -5,6 +5,7 @@
 # 2014-08-07
 
 import serial
+import time
 import math
 from parameters import Cons, Vars
 
@@ -39,19 +40,48 @@ class ArdData( serial.Serial ) :
 		super(ArdData, self).__init__(baudrate = rate)
 		# Identify valid serial port
 		portNo = 0
-		while True :
-			# Loops through serial ports until connection found
-			try :
-				self.port = '/dev/ttyACM' + str(portNo)
-				self.open()
-				break
+		try :
+			if Vars.computerType == 'Mac' :
+				while True :
+					# Loops through serial ports until connection found
+					try :
+						self.port = '/dev/tty.usbmodem' + str(portNo)
+						self.open()
+						break
 
-			except serial.SerialException :
-				portNo += 1
+					except serial.SerialException :
+						portNo += 1
+					except OSError :
+						portNo += 1
 
-			if portNo > 8 :
-				print "Please connect the Arduino"
-				break
+					if portNo > 32767 :
+						print "Please connect the Arduino"
+						break
+
+			elif Vars.computerType == 'Linux' :
+				print "linux"
+				while True :
+					# Loops through serial ports until connection found
+					try :
+						self.port = '/dev/ttyACM' + str(portNo)
+						self.open()
+						break
+
+					except serial.SerialException :
+						portNo += 1
+
+					if portNo > 8 :
+						print "Please connect the Arduino"
+						break
+		except serial.SerialException :
+
+			print "Please connect the Arduino"
+			time.sleep(2)
+		
+		except portNotOpenError :
+
+			print "Please connect the Arduino"
+			time.sleep(2)
 
 		self.flushInput()
 
