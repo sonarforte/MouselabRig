@@ -4,13 +4,9 @@
 # Steven Rofrano
 # 2014-09-10
 
-	import serial
-	import time
-	import math
-	import sys
-	from parameters import Cons, Vars
-
-
+import serial
+import time
+import sys
 
 class Arduino( serial.Serial ):
 
@@ -20,46 +16,25 @@ class Arduino( serial.Serial ):
 	exclusively useful to the Arduino in MouselabRig'''
 
 
-	def __init__( self, rate, enc = 'A02' ):
+	def __init__( self, rate ):
 		'''Finds the correct port and initializes serial communication at baudrate "rate"
 		Takes the name of the encoder as a string for motion calculations'''
 
 		self.sentMsgs = 0
-		self.startTime = 0
-		self.time = []
-		self.photoState = 0
-		
-		self.numRealLaps = 0
-		self.realLaps = []
-		self.numVirtualLaps = 0
-		self.virtualLaps = []
-		self.realPosition = []				# list contains linear position in current lap
-		self.virtualPosition = []
-		self.realLapDist = 0
-		self.virtualLapDist = 0
-		
-		self.ticks = 0
-		self.displacement = []			# list contains linear displacement (time component in millis)
-		self.velocity = []			# list contains linear velocity
-		self.acceleration = []
-		self.valveState = []
-		self.latency = []
-		self.revs = 0
-		self.index = 0			# number of messages received
-		
 		self.sendMsg = False
 		self.valveOpenTime = 0
 
-
-		super(ArdData, self).__init__(baudrate = rate)
+		super(Arduino, self).__init__(baudrate = rate)
 		# Identify valid serial port
+		namesFailed = 0
 		portNo = 0
+		portName = '/dev/ttyACM'
 		try:
 		
 			while True:
 				# Loops through serial ports until connection found
 				try:
-					self.port = '/dev/ttyACM' + str(portNo)
+					self.port =  portName + str(portNo)
 					self.open()
 					break
 
@@ -68,51 +43,31 @@ class Arduino( serial.Serial ):
 				except OSError:
 					portNo += 1
 
-				if portNo > 10:
-
+				if portNo > 32767:
+					namesFailed += 1
 					portNo = 0
-					while True: 
-						try:
-							self.port = '/dev/tty.usbmodem' + str(portNo)
-							self.open()
-							break
+					portName = '/dev/tty.usbmodem'
 
-						except serial.SerialException:
-							portNo += 1
-						except OSError:
-							portNo += 1
-
-						if portNo > 32767:
-							msg = 'Seril Connection not found. ' \
-							'Please connect the Arduino.\nQuitting now.'
-							sys.exit(msg)
-					break				
-				
+				if namesFailed > 1:
+					msg = 'Serial Connection not found. Please connect the Arduino.\n' \
+					      'Quitting now.'
+					sys.exit(msg)
+					
 		except serial.SerialException:
 
 			print "Please connect the Arduino"
 			time.sleep(2)
 		
-
 		self.flushInput()
 
-	def msgToList( self ):
+
+	def readMsg( self ):
 		'''Reads the message from Arduino and separates data by commas into a list'''
+	
+		return self.readline().split(',')
+		 
 
-		self.msg = self.readline().split(',')
-		return self.msg
-
-	def msgCheck( self ):
-		'''Returns true if the incoming data stream adheres to message protocol'''
-
-		header = bool((self.msg[0] == 'ARD') and (self.msg[1:(len(self.msg) - 1)] != 'ARD'))
-		trailer = bool(self.msg[len(self.msg) - 1] == '\n')
-		return header and trailer
-
-
-
-
-def __sendMsg( self, valveMS = 0, moreData = 0,  reset = 0 ):
+	def __sendMsg( self, valveMS = 0, moreData = 0,  reset = 0 ):
 		'''Sends a message over serial to Arduino.
 
 		Includes Pi header, reset flag (only used once), and duration (ms) to open the valve.
@@ -122,8 +77,10 @@ def __sendMsg( self, valveMS = 0, moreData = 0,  reset = 0 ):
 		msg = 'PI,VAL,%d,MORE,%d,RES,%d,\n' % (valveMS, moreData, reset)
 		self.write(msg)
 		self.sendMsg = False
+		self.sentMsgs += 1
 
-	def msgRequest( self ):
+
+	def requestMsg( self ):
 		'''Tells the Arduino to send new data.
 
 		Sends a message over serial after the current data stream has been processed and
@@ -131,25 +88,19 @@ def __sendMsg( self, valveMS = 0, moreData = 0,  reset = 0 ):
 
 		self.flushOutput()
 		if self.sendMsg:
-			if self.valveOpenTime:
-				self.__sendMsg(self.valveOpenTime, 1)
-				self.valveOpenTime = 0
-			
-			else:
-				self.__sendMsg(0, 1)
+			self.__sendMsg(self.valveOpenTime, 1)
+			self.valveOpenTime = 0
+	
 
-
-
-	def valveOpen( self, ms ):
+	def openValve( self, ms ):
 		'''Opens the water valve for MS milliseconds.
 
 		Sends a message over serial with the length of time for the Arduino to open the valve.'''
 
 		self.valveOpenTime = ms
-		# print 'valveopen = ms'
 
 
-	def resetARD( self ):
+	def resetArd( self ):
 		'''Resets the Arduino and re-initializes eeverything.
 
 		Sends a message over serial with the reset flag set to one. Should only be called on 

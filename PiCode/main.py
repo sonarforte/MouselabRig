@@ -1,16 +1,20 @@
 #!/usr/bin/python
 # main.py
-# Interfaces with Arduino via ardial data stream
+# Interfaces with arduino via arduinoial data stream
 # Steven Rofrano
 # 2014-07-28
 
 import time
-import threading
-from data import ArdData 	# subclass of pySerial deals specifically with Arduino needs
+import sys
+from arduino import Arduino 	# subclass of pySerial deals specifically with arduino needs
+from data import Data
+from parameters import Cons, Vars
+
 
 
 # Initialize communications
-ard = ArdData(115200, 'A02')
+arduino = Arduino(Cons.baud_rate)
+data = Data(arduino, 'log.txt')
 outfile = open('log.txt', 'w')
 
 print '\nThank you for choosing MouselabRig. We hope you find this experience enjoyable.\n'
@@ -22,70 +26,70 @@ else:
 	sys.exit('Fine. Have a nice day.')
 
 
-print "Firing up the Arduino"
+print "Firing up the arduino"
 
-ard.resetARD()
+arduino.resetArd()
 
 print "ready"
 
 lastTime1 = 0
 lastTime2 = 0
-while ard.isOpen():
+while arduino.isOpen():
 
 	try:
 		
-		ard.msgRequest()
+		arduino.requestMsg()
 
-		if ard.inWaiting():
+		if arduino.inWaiting():
 			# print "INWAITING"
-			# lst = ard.readline()
+			# lst = arduino.readline()
 			# if lst[0] != 'A':
 			# 	print lst
 
-			# print ard.readline()
+			# print arduino.readline()
 
-			# ard.msgToList()		# reads the stream from the Arduino into a list
+			# arduino.msgToList()		# reads the stream from the arduino into a list
 
-			ard.parseValues()
-
-			
-			# # dataline = "PI,N,%d,MS,%d,PS,%d,NL,%d,CHA,%d,CHB,%d,\n" % (ard.receivedMsgs, 
-			# 		# ard.millis, ard.photoState, ard.numLaps, ard.chA, ard.chB)
+			data.parseMsg()
 
 			
+			# # dataline = "PI,N,%d,MS,%d,PS,%d,NL,%d,CHA,%d,CHB,%d,\n" % (arduino.receivedMsgs, 
+			# 		# arduino.millis, arduino.photoState, arduino.numLaps, arduino.chA, arduino.chB)
 
-			# # if ard.receivedMsgs < 1000:
+			
+
+			# # if arduino.receivedMsgs < 1000:
 			# 	# outfile.write(dataline)
-			# # elif ard.receivedMsgs == 1000:
+			# # elif arduino.receivedMsgs == 1000:
 			# 	# outfile.close()
 
-			# if (time.clock() - lastTime1 > 1) and (ard.index > 1):
+			# if (time.clock() - lastTime1 > 1) and (data.index > 1):
 			
-			# print ard.msg
-			print 'time:			', ard.time[ard.index - 1]	
-			print 'index:			', ard.index            
-			if (ard.index > 1):						
-				# print 'received to date: ', ard.index
-				print 'acceleration:		', ard.acceleration[ard.index - 1]
-				print 'velocity:		', ard.velocity[ard.index - 1]
-				print 'displacement:		', ard.displacement[ard.index - 1]
-				print 'real position:		', ard.realPosition[ard.index - 1]
-				print 'real laps:		', ard.numRealLaps
-				print 'virtual position:	', ard.virtualPosition[ard.index - 1]
-				print 'virtual laps:		', ard.numVirtualLaps
-				print 'latency:		', ard.latency[ard.index - 1], '\n'
+			# print arduino.msg
+			print 'time:			', data.time[data.index - 1]	
+			print 'index:			', data.index            
+			if (data.index > 1):						
+				# print 'received to date: ', data.index
+				print 'acceleration:		', data.acceleration[data.index - 1]
+				print 'velocity:		', data.velocity[data.index - 1]
+				print 'displacement:		', data.displacement[data.index - 1]
+				print 'real position:		', data.realPosition[data.index - 1]
+				print 'real laps:		', data.numRealLaps
+				print 'virtual position:	', data.virtualPosition[data.index - 1]
+				print 'virtual laps:		', data.numVirtualLaps
+				print 'latency:		', data.latency[data.index - 1], '\n'
 			# 	lastTime1 = time.clock()
 
-			ard.sendMsg = True
+			arduino.sendMsg = True
 			
 
 		# print 'yo'
 		
 		# if time.clock() - lastTime2 > 2:
-		if (ard.index > 1):
-			if (ard.realLaps[ard.index - 1] > ard.realLaps[ard.index - 2]):
-				if ard.realPosition[ard.index - 1] > 100:
-					ard.valveOpen(100)
+		if (data.index > 1):
+			if (data.realLaps[data.index - 1] > data.realLaps[data.index - 2]):
+				if data.realPosition[data.index - 1] > 100:
+					arduino.openValve(100)
 			# lastTime2 = time.clock()
 
 
@@ -93,11 +97,11 @@ while ard.isOpen():
 
 	except OSError:
 
-		print "Why is there an OSError? Possibly because you reset the Arduino?"
+		print "Why is there an OSError? Possibly because you reset the arduino?"
 		time.sleep(2)
 	
 	except IOError:
 
-		print "Plug the Arduino back in"
+		print "Plug the arduino back in"
 		time.sleep(2)
 

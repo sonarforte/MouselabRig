@@ -15,7 +15,7 @@ class Cons:
 	encoder_model_C02 = 100		# pulses per revolution for HEDS-5540-C02
 	wheel_radius = 5 			# radius of rig wheel (cm)
 	belt_length = 137 			# circumfrence of belt (cm)
-
+	baud_rate = 115200
 
 class Vars:
 
@@ -44,6 +44,11 @@ class Vars:
 	computerType = 'Linux'
 	# computerType = 'Pi'
 	# computerType = 'Mac'
+
+
+	# Do you want to log data for this experiment?
+	wantToLog = True
+	# wantToLog = False
 	
 	
 	# Variable-Choice Variables

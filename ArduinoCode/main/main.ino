@@ -157,7 +157,7 @@ Shuts off the valve at the end of the loop if its open duration has expired. */
 void loop() {
 	
 	/* Send new data if it's Arduino's turn to message Pi	
-	zTest the sendMsg flag (only set upon successful parsing by processPiData()) */
+	Test the sendMsg flag (only set upon successful parsing by processPiData()) */
 	if (sendMsg) {
 		
 		/* Send the most recent sensor values which have been updated 
