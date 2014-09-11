@@ -22,9 +22,6 @@ class Vars:
 	'''Defines all the variables that determine the conditional reward system.
 
 	Comment out '''
-
-	# def __init__( self ) :
-	
 	
 
 	# Multiple-Choice Variables
@@ -54,15 +51,20 @@ class Vars:
 	# Variable-Choice Variables
 	# Update each variable with your preferred value 
 	
-	experimenterInitials = 'SR'						# your initials (as a string)			
+	yourInitials = 'SR'						# your initials (as a string)			
 	mouseName = 'Jerry'								# name of your mouse (as a string)
 	virtualLapLength = 100							# length of virtual lap (cm)
 	valveOpenMillis = 100							# amount of time to open valve (ms)
 	# Path to save log files on different computers
-	logPathPi = '/home/pi/'				 
-	logPathLinux = '/home/mouselab/Dropbox/Repository/MouselabRig/'
+	logFilePi = '/home/pi/log.txt'				 
+	logFileLinux = '/home/mouselab/Dropbox/Repository/MouselabRig/log.txt'
+	logFileMac = '/Users/name/Documents/log.txt'
 	
 
-
-
+	# Params gets printed to the log file once at the beginning of each 
+	# experiment. Include information from this file that you would like
+	# to have for later reference. For info about the syntax, look at python's
+	# string.format() documentation	
+	params = 'Run by {0} with mouse {1} and virtual lap {2} cm and valve open for {3} ms.\n' \
+			 .format(yourInitials, mouseName, virtualLapLength, valveOpenMillis)
 

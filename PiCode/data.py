@@ -6,6 +6,7 @@
 
 
 import math
+import datetime
 from parameters import Cons, Vars
 
 
@@ -32,13 +33,23 @@ class Data:
 		self.displacement = []			# list contains linear displacement (time component in millis)
 		self.velocity = []			# list contains linear velocity
 		self.acceleration = []
-		self.valveState = []
+		self.valveState = 0
 		self.latency = []
 		self.revs = 0
 		self.index = 0			# number of messages received
 
-		self.outFile = open(filePath, 'w')
-		#ADD LINE TO WRITE OUT NECESSARY PARAMETERS FIRST (DATE, NAME, ETC)
+		self.trials = 0
+		self.successes = 0
+
+		if Vars.wantToLog:
+			self.outFile = open(filePath, 'w')
+			t = str(datetime.datetime.today())
+			self.outFile.write(t + '\n')
+			self.outFile.write(Vars.params + '\n')
+			ref = 'Index, Time, Displacement, Velocity, Acceleration, ' \
+				  'Real_Position, Real_Laps, Virtual_Position, ' \
+				  'Virtual_Laps, Valve_State\n'
+			self.outFile.write(ref)
 
 
 	def checkMsg( self ):
@@ -76,6 +87,7 @@ class Data:
 
 			self.index += 1			# update message index number
 
+
 		# for now... come up with a better way to handle this after implementation of experiments
 		else: 
 			print 'msg didnt parse'
@@ -110,14 +122,16 @@ class Data:
 		disp = 2 * math.pi * Cons.wheel_radius * self.revs
 		self.displacement.append(disp)
 		self.realPosition.append(disp - self.realLapDist)
+		
 		if disp - self.virtualLapDist > Vars.virtualLapLength:
 			self.__resetVirtualPositionMarker()
 			self.numVirtualLaps += 1
-			self.virtualLaps.append(self.numVirtualLaps)
+		self.virtualLaps.append(self.numVirtualLaps)
 		self.virtualPosition.append(disp - self.virtualLapDist)
+		
 		if self.time[i] == 0:
-			self.velocity.append(0)
-			self.acceleration.append(0)
+			self.velocity.append(0.0)
+			self.acceleration.append(0.0)
 		else:
 			dt = (self.time[i] - self.time[i - 1])
 			self.velocity.append(1000 * (self.displacement[i] - self.displacement[i - 1]) / dt)
@@ -147,7 +161,7 @@ class Data:
 		Pulls value from stream and appends it to a list.'''
 		k = self.incoming.index('VAL') + 1
 		val = int(self.incoming[k])
-		self.valveState.append(val)
+		self.valveState = val
 
 
 	def __resetRealPositionMarker( self ):
@@ -175,10 +189,17 @@ class Data:
 		recent of all calculated values. Should start logging after request for 
 		new information so Arduino has time to respond in the interim.'''
 		
-		n = self.index - 1
+		if not Vars.wantToLog:
+			return
 
-		line = 'PI,N,%d,MS,%d,X,%f,V,%f,A,%f,RP,%f,RL,%d,VP,%f,VL,%d,VAL,%d,' \
-			   'L,%f,\n' % (n, self.time[n], self.displacement[n], 
-			   self.velocity[n], self.acceleration[n], self.realPosition[n],
-			   self.realLaps[n], self.virtualPosition[n], self.virtualLaps[n],
-			   self.valveState[n])
+		n = self.index - 1
+			
+
+
+		line = 'N,{0},T,{1},X,{2},V,{3},A,{4},RP,{5},RL,{6},VP,{7},' \
+			   'VL,{8},VAL,{9},\n'.format(n, self.time[n], 
+			   self.displacement[n], self.velocity[n], self.acceleration[n],
+			   self.realPosition[n], self.numRealLaps, self.virtualPosition[n],
+			   self.numVirtualLaps, self.valveState)
+
+		self.outFile.write(line)

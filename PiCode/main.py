@@ -14,8 +14,13 @@ from parameters import Cons, Vars
 
 # Initialize communications
 arduino = Arduino(Cons.baud_rate)
-data = Data(arduino, 'log.txt')
-outfile = open('log.txt', 'w')
+
+if Vars.computerType == 'Linux':
+	data = Data(arduino, Vars.logFileLinux)
+elif Vars.computerType == 'Pi':
+	data = Data(arduino, Vars.logFilePi)
+elif Vars.computerType == 'Mac':
+	data = Data(arduino, Vars.logFileMac)
 
 print '\nThank you for choosing MouselabRig. We hope you find this experience enjoyable.\n'
 print 'If you didn\'t update the parameters for this experiment, quit (CTRL-Z) and do so now.\n'
@@ -53,8 +58,7 @@ while arduino.isOpen():
 			data.parseMsg()
 
 			
-			# # dataline = "PI,N,%d,MS,%d,PS,%d,NL,%d,CHA,%d,CHB,%d,\n" % (arduino.receivedMsgs, 
-			# 		# arduino.millis, arduino.photoState, arduino.numLaps, arduino.chA, arduino.chB)
+			
 
 			
 
@@ -68,19 +72,21 @@ while arduino.isOpen():
 			# print arduino.msg
 			print 'time:			', data.time[data.index - 1]	
 			print 'index:			', data.index            
-			if (data.index > 1):						
+			# if (data.index > 0):						
 				# print 'received to date: ', data.index
-				print 'acceleration:		', data.acceleration[data.index - 1]
-				print 'velocity:		', data.velocity[data.index - 1]
-				print 'displacement:		', data.displacement[data.index - 1]
-				print 'real position:		', data.realPosition[data.index - 1]
-				print 'real laps:		', data.numRealLaps
-				print 'virtual position:	', data.virtualPosition[data.index - 1]
-				print 'virtual laps:		', data.numVirtualLaps
-				print 'latency:		', data.latency[data.index - 1], '\n'
+			print 'acceleration:		', data.acceleration[data.index - 1]
+			print 'velocity:		', data.velocity[data.index - 1]
+			print 'displacement:		', data.displacement[data.index - 1]
+			print 'real position:		', data.realPosition[data.index - 1]
+			print 'real laps:		', data.numRealLaps
+			print 'virtual position:	', data.virtualPosition[data.index - 1]
+			print 'virtual laps:		', data.numVirtualLaps
+			print 'valve:			', data.valveState
+			print 'latency:		', data.latency[data.index - 1], '\n'
 			# 	lastTime1 = time.clock()
 
 			arduino.sendMsg = True
+			data.logData()
 			
 
 		# print 'yo'
@@ -105,3 +111,7 @@ while arduino.isOpen():
 		print "Plug the arduino back in"
 		time.sleep(2)
 
+	except KeyboardInterrupt:
+
+		data.outFile.close()
+		sys.exit('Experiment concluded. Now have fun analyzing all that data!')
