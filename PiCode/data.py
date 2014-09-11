@@ -44,7 +44,7 @@ class Data:
 		if Vars.wantToLog:
 			self.outFile = open(filePath, 'w')
 			t = str(datetime.datetime.today())
-			self.outFile.write(t + '\n')
+			self.outFile.write('MouselabRig Log for Experiment On' + t + '\n')
 			self.outFile.write(Vars.params + '\n')
 			ref = 'Index, Time, Displacement, Velocity, Acceleration, ' \
 				  'Real_Position, Real_Laps, Virtual_Position, ' \
@@ -98,17 +98,23 @@ class Data:
 		'''Pulls MS from data stream, normalizes the time and keeps a timer in self.millis'''
 
 		k = self.incoming.index('MS') + 1
-		self.millis = int(self.incoming[k])
+		millis = int(self.incoming[k])
 
 		if self.index == 0:
-			self.startTime = self.millis
+			self.startTime = millis
 
-		self.millis -= self.startTime		# normalize timer to start at 0
+		millis -= self.startTime		# normalize timer to start at 0
 
-		self.time.append(self.millis)
+		self.time.append(millis)
 		if len(self.time) > 0:
-			deltaT = self.millis - self.time[self.index - 1]
+			deltaT = millis - self.time[self.index - 1]
 			self.latency.append(deltaT)
+
+		seconds = millis / 1000.0
+		minutes = int(math.floor(seconds / 60.0))
+		seconds = seconds % 60
+		self.humanTime = '{0}:{1}'.format(minutes, seconds)
+
 
 
 	def __getENC( self ):
@@ -211,13 +217,13 @@ class Data:
 		'''Prints values to the screen.'''
 		n = self.index - 1
 
-		print 'Time:			', data.time[n]	          
-		print 'Displacement:		', data.displacement[n]
-		print 'Velocity:		', data.velocity[n]
-		print 'Acceleration:		', data.acceleration[n]
-		print 'Real Position:		', data.realPosition[data.index - 1]
-		print 'Real Lap Count:		', data.numRealLaps
-		print 'Virtual Position:	', data.virtualPosition[data.index - 1]
-		print 'Virtual Lap Count:		', data.numVirtualLaps
-		print 'Number of Trials     ', self.trials
-		print 'Number of Successes  ', self.successes
+		print 'Time:			', self.humanTime 	         
+		print 'Displacement:		', self.displacement[n]
+		print 'Velocity:		', self.velocity[n]
+		print 'Acceleration:		', self.acceleration[n]
+		print 'Real Position:		', self.realPosition[n]
+		print 'Real Lap Count:		', self.numRealLaps
+		print 'Virtual Position:	', self.virtualPosition[n]
+		print 'Virtual Lap Count:	', self.numVirtualLaps
+		print 'Number of Trials       ', self.trials
+		print 'Number of Successes    ', self.successes, '\n'

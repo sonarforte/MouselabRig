@@ -21,14 +21,17 @@ elif Vars.computerType == 'Pi':
 	data = Data(arduino, Vars.logFilePi)
 elif Vars.computerType == 'Mac':
 	data = Data(arduino, Vars.logFileMac)
-
-print '\nThank you for choosing MouselabRig. We hope you find this experience enjoyable.\n'
-print 'If you didn\'t update the parameters for this experiment, quit (CTRL-Z) and do so now.\n'
-begin = raw_input('Ready to begin? (Y/N) ')
-if (begin == 'Y') or (begin == 'y'):
-	pass
-else: 
-	sys.exit('Fine. Have a nice day.')
+try:
+	print '\nThank you for choosing MouselabRig. We hope you find this experience' \
+	 'enjoyable.\nIf you didn\'t update the parameters for this experiment, quit ' \
+	 '(CTRL-C) and do so now.\n'
+	begin = raw_input('Ready to begin? (Y/N) ')
+	if (begin == 'Y') or (begin == 'y'):
+		pass
+	else: 
+		sys.exit('Have a nice day.')
+except KeyboardInterrupt:
+	sys.exit('\nBe back soon!')
 
 
 print "Firing up the arduino"
@@ -46,49 +49,18 @@ while arduino.isOpen():
 		arduino.requestMsg()
 
 		if arduino.inWaiting():
-			# print "INWAITING"
-			# lst = arduino.readline()
-			# if lst[0] != 'A':
-			# 	print lst
-
-			# print arduino.readline()
-
-			# arduino.msgToList()		# reads the stream from the arduino into a list
 
 			data.parseMsg()
 
-		
-
-			# if (time.clock() - lastTime1 > 1) and (data.index > 1):
-			
-			# # print arduino.msg
-			# print 'time:			', data.time[data.index - 1]	
-			# print 'index:			', data.index            
-			# # if (data.index > 0):						
-			# 	# print 'received to date: ', data.index
-			# print 'acceleration:		', data.acceleration[data.index - 1]
-			# print 'velocity:		', data.velocity[data.index - 1]
-			# print 'displacement:		', data.displacement[data.index - 1]
-			# print 'real position:		', data.realPosition[data.index - 1]
-			# print 'real laps:		', data.numRealLaps
-			# print 'virtual position:	', data.virtualPosition[data.index - 1]
-			# print 'virtual laps:		', data.numVirtualLaps
-			# print 'valve:			', data.valveState
-			# print 'latency:		', data.latency[data.index - 1], '\n'
-			# # 	lastTime1 = time.clock()
 			data.displayData()
 			arduino.sendMsg = True
 			data.logData()
 			
 
-		# print 'yo'
-		
-		# if time.clock() - lastTime2 > 2:
 		if (data.index > 1):
 			if (data.realLaps[data.index - 1] > data.realLaps[data.index - 2]):
 				if data.realPosition[data.index - 1] > 100:
 					arduino.openValve(100)
-			# lastTime2 = time.clock()
 
 
 		
@@ -106,4 +78,4 @@ while arduino.isOpen():
 	except KeyboardInterrupt:
 
 		data.outFile.close()
-		sys.exit('Experiment concluded. Now have fun analyzing all that data!')
+		sys.exit('\nExperiment concluded. Now have fun analyzing all that data!')
