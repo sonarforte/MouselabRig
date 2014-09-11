@@ -193,13 +193,31 @@ class Data:
 			return
 
 		n = self.index - 1
-			
 
-
+		# Format the line containing all the data to be printed
+		# If this line changes, the legend line printed at the beginning
+		# of the log file should be modified to reflect those changes as well
+		# The code for the legend is in self.__init__() (above)
 		line = 'N,{0},T,{1},X,{2},V,{3},A,{4},RP,{5},RL,{6},VP,{7},' \
-			   'VL,{8},VAL,{9},\n'.format(n, self.time[n], 
+			   'VL,{8},VAL,{9},TRI,{10},SUC,{11},\n'.format(n, self.time[n], 
 			   self.displacement[n], self.velocity[n], self.acceleration[n],
 			   self.realPosition[n], self.numRealLaps, self.virtualPosition[n],
-			   self.numVirtualLaps, self.valveState)
+			   self.numVirtualLaps, self.valveState, self.trials, 
+			   self.successes)
 
 		self.outFile.write(line)
+
+	def displayData( self ):
+		'''Prints values to the screen.'''
+		n = self.index - 1
+
+		print 'Time:			', data.time[n]	          
+		print 'Displacement:		', data.displacement[n]
+		print 'Velocity:		', data.velocity[n]
+		print 'Acceleration:		', data.acceleration[n]
+		print 'Real Position:		', data.realPosition[data.index - 1]
+		print 'Real Lap Count:		', data.numRealLaps
+		print 'Virtual Position:	', data.virtualPosition[data.index - 1]
+		print 'Virtual Lap Count:		', data.numVirtualLaps
+		print 'Number of Trials     ', self.trials
+		print 'Number of Successes  ', self.successes

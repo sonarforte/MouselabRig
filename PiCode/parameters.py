@@ -25,7 +25,7 @@ class Vars:
 	
 
 	# Multiple-Choice Variables
-	# Comment out (CTRL-/ on Linux/Mac) all but one line from each group
+	# Comment out (CTRL-/ on Linux) all but one line from each group
 	
 	# Set True if you want the experiment to be run with a virtual lap (define length below)
 	virtualLaps = False

@@ -57,34 +57,26 @@ while arduino.isOpen():
 
 			data.parseMsg()
 
-			
-			
-
-			
-
-			# # if arduino.receivedMsgs < 1000:
-			# 	# outfile.write(dataline)
-			# # elif arduino.receivedMsgs == 1000:
-			# 	# outfile.close()
+		
 
 			# if (time.clock() - lastTime1 > 1) and (data.index > 1):
 			
-			# print arduino.msg
-			print 'time:			', data.time[data.index - 1]	
-			print 'index:			', data.index            
-			# if (data.index > 0):						
-				# print 'received to date: ', data.index
-			print 'acceleration:		', data.acceleration[data.index - 1]
-			print 'velocity:		', data.velocity[data.index - 1]
-			print 'displacement:		', data.displacement[data.index - 1]
-			print 'real position:		', data.realPosition[data.index - 1]
-			print 'real laps:		', data.numRealLaps
-			print 'virtual position:	', data.virtualPosition[data.index - 1]
-			print 'virtual laps:		', data.numVirtualLaps
-			print 'valve:			', data.valveState
-			print 'latency:		', data.latency[data.index - 1], '\n'
-			# 	lastTime1 = time.clock()
-
+			# # print arduino.msg
+			# print 'time:			', data.time[data.index - 1]	
+			# print 'index:			', data.index            
+			# # if (data.index > 0):						
+			# 	# print 'received to date: ', data.index
+			# print 'acceleration:		', data.acceleration[data.index - 1]
+			# print 'velocity:		', data.velocity[data.index - 1]
+			# print 'displacement:		', data.displacement[data.index - 1]
+			# print 'real position:		', data.realPosition[data.index - 1]
+			# print 'real laps:		', data.numRealLaps
+			# print 'virtual position:	', data.virtualPosition[data.index - 1]
+			# print 'virtual laps:		', data.numVirtualLaps
+			# print 'valve:			', data.valveState
+			# print 'latency:		', data.latency[data.index - 1], '\n'
+			# # 	lastTime1 = time.clock()
+			data.displayData()
 			arduino.sendMsg = True
 			data.logData()
 			
