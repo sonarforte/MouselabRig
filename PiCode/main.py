@@ -60,8 +60,8 @@ while arduino.isOpen():
 			arduino.sendMsg = True
 			data.logData()
 		
-		if data.index > 1:
-			if gettatr(posit, 'newLap')():
+		if data.index > 0:
+			if getattr(posit, Vars.positional)():
 				
 				if probability(Vars.probability):
 					arduino.openValve(Vars.valveOpenMillis)

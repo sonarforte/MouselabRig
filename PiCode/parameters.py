@@ -82,11 +82,12 @@ class Vars:
 	# conditions.py and read the comments there.
 
 	# Positional Conditions
-	# Set the parameter below to the positional requirement to be tested.
+	# Define the parameter below as the positional requirement to be tested.
+	# (written as a string).
 	# A successful test of this condition will result in the 'trials' 
 	# counter being incremented by one.
-	# positional = timeElapsed
-	# positional = newLap
+	# positional = 'timeElapsed'
+	positional = 'newLap'
 
 
 	# Specify the behavioral conditions to be tested. They will execute in 
@@ -104,7 +105,7 @@ class Vars:
 
 	# After the test has been passed, the release of water is determined with
 	# the probability defined below. Set to 1 for water to always be released.
-	probability = .5 		# 0 <= p <= 1
+	probability = 1 		# 0 <= p <= 1
 
 
 	# Arguments for conditions

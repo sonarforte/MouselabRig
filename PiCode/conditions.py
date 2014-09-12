@@ -59,7 +59,8 @@ class Positional:
 
 		If virtual laps are set, the function tests for a new virtual lap.
 		Otherwise, real laps will be tested.'''
-
+		if self.data.index < 2:
+			return False
 		if Vars.virtualLaps:
 			if self.data.virtualLaps[-1] > self.data.virtualLaps[-2]:
 				return True
@@ -68,6 +69,7 @@ class Positional:
 			if self.data.realLaps[-1] > self.data.realLaps[-2]:
 				return True
 			return False
+	
 
 
 
