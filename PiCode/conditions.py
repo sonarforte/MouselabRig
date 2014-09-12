@@ -132,16 +132,62 @@ class Behavioral:
 		return True
 
 	def isAboveVelocity( self ):
-		pass
+		'''Returns true if velocity is above Vars.minVelocity.
+
+		Calculates average velocity from five most recent values and compares
+		that with the min velocity.'''
+		
+		if self.data.index > 5:
+			avgVel = sum(self.data.velocity[-5:])
+			avgVel = avgVel / 5.0
+			if avgVel >= Vars.minVelocity:
+				return True
+		return False
 
 
 	def isBelowVelocity( self ):
-		pass
+		'''Returns true if velocity is below Vars.maxVelocity.
+
+		Calculates average velocity from five most recent values and compares
+		that with the min velocity.'''
+		
+		if self.data.index > 5:
+			avgVel = sum(self.data.velocity[-5:])
+			avgVel = avgVel / 5.0
+			if avgVel <= Vars.minVelocity:
+				return True
+		return False
 
 
 	def isAboveAcceleration( self ):
-		pass
+		'''Returns true if acceleration is above Vars.minAcceleration.
+
+		Calculates average acceleration from two most recent values and compares
+		that with the min acceleration.'''
+		
+		if self.data.index > 2:
+			avgAcc = sum(self.data.acceleration[-2:])
+			avgAcc = avgAcc / 2.0
+			if avgAcc >= Vars.minAcceleration:
+				return True
+		return False
 
 
 	def isBelowAcceleration( self ):
-		pass
+		'''Returns true if acceleration is below Vars.maxAcceleration.
+
+		Calculates average acceleration from two most recent values and compares
+		that with the max acceleration.'''
+		
+		if self.data.index > 2:
+			avgAcc = sum(self.data.acceleration[-2:])
+			avgAcc = avgAcc / 2.0
+			if avgAcc <= Vars.maxAcceleration:
+				return True
+		return False
+
+	def isStopped( self ):
+		'''Returns true if velocity is zero.
+
+		A tolerance for velocity variance can be specified in the 
+		parameters.'''

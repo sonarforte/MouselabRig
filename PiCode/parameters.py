@@ -87,9 +87,9 @@ class Vars:
 	## A successful test of this condition will result in the 'trials' 
 	## counter being incremented by one.
 	# positional = 'timeElapsed'
-	# positional = 'newLap'
+	positional = 'newLap'
 	# positional = 'randomTimeElapsed'
-	positional = 'randomDisplacement'
+	# positional = 'randomDisplacement'
 	## Warning - Setting to none means the condition is always true
 	# positional = 'none'	
 
@@ -102,13 +102,16 @@ class Vars:
 	# 'successes' variable to be incremented. 
 	# Whether the water is released at this point, however, is determined by 
 	# the probability set for the experiment (below). 
-	behavioral1 = 'none'
-	behavioral2 = 'none'
-	behavioral3 = 'none'
+	methods = ['none', 'isAboveVelocity', 'isBelowVelocity', \
+			  'isAboveAcceleration', 'isBelowAcceleration']
+
+	behavioral1 = methods[0]
+	behavioral2 = methods[0]
+	behavioral3 = methods[0]
 
 	# After the test has been passed, the release of water is determined with
 	# the probability defined below. Set to 1 for water to always be released.
-	probability = 1 		# 0 <= p <= 1
+	probability = .8 		# 0 <= p <= 1
 
 
 	# Arguments for conditions
@@ -116,7 +119,7 @@ class Vars:
 	# Set the relevent parameters for each condition method below
 
 	# timeElapsed()
-	elapsedTime = 1000		# interval for timeElapsed() to return true (ms)
+	elapsedTime = 5000		# interval for timeElapsed() to return true (ms)
 	
 
 	# randomTimeElapsed()
@@ -129,3 +132,21 @@ class Vars:
 	# positional condition 
 	randDispLower = 20
 	randDispUpper = 100
+
+
+
+
+
+	## Parameters for behavioral conditions
+
+	## isAboveVelocity()
+	minVelocity = 15 			# cm/s
+
+	## isBelowVelocity()
+	maxVelocity = 15 			# cm/s
+
+	## isAboveAcceleration()
+	minAcceleration = .1 		#cm/s^2
+
+	## isBelowAcceleration()
+	maxAcceleration = .1 		# cm/s^2
