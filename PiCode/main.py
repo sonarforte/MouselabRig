@@ -62,9 +62,13 @@ while arduino.isOpen():
 		
 		if data.index > 0:
 			if getattr(posit, Vars.positional)():
-				
-				if probability(Vars.probability):
-					arduino.openValve(Vars.valveOpenMillis)
+				data.trials += 1
+				if getattr(behave, Vars.behavioral1)():
+					if getattr(behave, Vars.behavioral2)():
+						if getattr(behave, Vars.behavioral3)():
+							data.successes += 1
+							if probability(Vars.probability):
+								arduino.openValve(Vars.valveOpenMillis)
 		
 
 	except OSError:

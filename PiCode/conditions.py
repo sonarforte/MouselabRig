@@ -39,6 +39,19 @@ class Positional:
 
 		self.data = dataObject
 		self.lastTime = 0
+		self.randTime = random.randrange(Vars.randTimeLower, Vars.randTimeUpper)
+		self.lastDisp = 0
+		self.randDisp = random.randrange(Vars.randDispLower, Vars.randDispUpper)
+
+
+	def none( self ):
+		'''Returns true.
+
+		When used as the positional condition, main will skip right to the 
+		behavior condition check with every iteration.'''
+
+		return True
+
 
 	def timeElapsed( self ):
 		'''Returns true after Vars.timeInterval seconds have elapsed.
@@ -46,9 +59,24 @@ class Positional:
 		Uses Vars.timeInterval parameter to set the interval for which
 		the method returns true.'''
 
-		if self.data.time[-1] - self.lastTime > Vars.timeInterval:
+		if self.data.time[-1] - self.lastTime > Vars.elapsedTime:
 			
 			self.lastTime = self.data.time[-1]
+			return True
+
+		return False
+
+
+	def randomTimeElapsed( self ):
+		'''Returns true if a random time in a given interval has elapsed.
+
+		Set the interval from which to find the random time in the paramter 
+		file.'''
+
+		if self.data.time[-1] - self.lastTime > self.randTime:
+			self.lastTime = self.data.time[-1]
+			self.randTime = random.randrange(Vars.randLowerBound, \
+				            Vars.randUpperBound)
 			return True
 
 		return False
@@ -71,6 +99,20 @@ class Positional:
 			return False
 	
 
+	def randomDisplacement( self ):
+		'''Returns true if a random distance has been travelled.
+
+		Set the interval in which to find a random distance in the parameter 
+		file.'''
+
+		if self.data.displacement[-1] - self.lastDisp > self.randDisp:
+			self.lastDisp = self.data.displacement[-1]
+			self.randDisp = random.randrange(Vars.randDispLower, \
+							Vars.randDispUpper)
+			return True
+		return False
+
+	
 
 
 
@@ -80,3 +122,26 @@ class Behavioral:
 	def __init__( self, dataObject ):
 
 		self.data = dataObject
+
+	def none( self ):
+		'''Returns true.
+
+		When used as the positional condition, main will skip right to the 
+		behavior condition check with every iteration.'''
+
+		return True
+
+	def isAboveVelocity( self ):
+		pass
+
+
+	def isBelowVelocity( self ):
+		pass
+
+
+	def isAboveAcceleration( self ):
+		pass
+
+
+	def isBelowAcceleration( self ):
+		pass

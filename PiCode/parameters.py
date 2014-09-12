@@ -69,39 +69,42 @@ class Vars:
 			 .format(yourInitials, mouseName, virtualLapLength, valveOpenMillis)
 
 
-	# Conditions
-	# The parameters in this section determine the behavior of the 
-	# conditional reward system. The condition block will be tested once for 
-	# every iteration of the main loop. The conditions are tested in order; 
-	# if a condition fails, execution of the condition block will cease and the 
-	# program will continue to run. 
-	# The test will be considered passed if and only if all the conditions are 
-	# satisfied. Even a passed test may fail to result in water reward, as is 
-	# deetermined by the result of the probability value specified below.
-	# To find out more information about the individual conditions, open 
-	# conditions.py and read the comments there.
+	## Conditions
+	## The parameters in this section determine the behavior of the 
+	## conditional reward system. The condition block will be tested once for 
+	## every iteration of the main loop. The conditions are tested in order; 
+	## if a condition fails, execution of the condition block will cease and the 
+	## program will continue to run. 
+	## The test will be considered passed if and only if all the conditions are 
+	## satisfied. Even a passed test may fail to result in water reward, as is 
+	## deetermined by the result of the probability value specified below.
+	## To find out more information about the individual conditions, open 
+	## conditions.py and read the comments there.
 
-	# Positional Conditions
-	# Define the parameter below as the positional requirement to be tested.
-	# (written as a string).
-	# A successful test of this condition will result in the 'trials' 
-	# counter being incremented by one.
+	## Positional Conditions
+	## Define the parameter below as the positional requirement to be tested.
+	## (written as a string).
+	## A successful test of this condition will result in the 'trials' 
+	## counter being incremented by one.
 	# positional = 'timeElapsed'
-	positional = 'newLap'
-
+	# positional = 'newLap'
+	# positional = 'randomTimeElapsed'
+	positional = 'randomDisplacement'
+	## Warning - Setting to none means the condition is always true
+	# positional = 'none'	
 
 	# Specify the behavioral conditions to be tested. They will execute in 
 	# order. If you do not want all conditions to be tested, define them as
-	# <none> in this list. E.g. condition3 = none
+	# <none> in this list. E.g. behavioral3 = none
 	# These conditions test mouse behavior and are called only if the 
 	# positional requirement from the positonal condition specified above is 
 	# met. A successful complettion of these conditions will result in the 
 	# 'successes' variable to be incremented. 
 	# Whether the water is released at this point, however, is determined by 
 	# the probability set for the experiment (below). 
-	# behavioral1 = none
-	# behavioral2 = none
-	# behavioral3
+	behavioral1 = 'none'
+	behavioral2 = 'none'
+	behavioral3 = 'none'
 
 	# After the test has been passed, the release of water is determined with
 	# the probability defined below. Set to 1 for water to always be released.
@@ -112,5 +115,17 @@ class Vars:
 	# The methods for testing conditions can't directly accept arguments.
 	# Set the relevent parameters for each condition method below
 
-	# parameters for Conditions.timeElapsed()
-	timeInterval = 1000		# interval for timeElapsed() to return true (ms)
+	# timeElapsed()
+	elapsedTime = 1000		# interval for timeElapsed() to return true (ms)
+	
+
+	# randomTimeElapsed()
+	randTimeLower = 300
+	randTimeUpper = 1000
+
+
+	# randomDisplacement()
+	# Set the boundaries for the random distance necessary to pass this 
+	# positional condition 
+	randDispLower = 20
+	randDispUpper = 100
