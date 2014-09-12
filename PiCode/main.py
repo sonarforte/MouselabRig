@@ -9,7 +9,7 @@ import sys
 from arduino import Arduino 	# subclass of pySerial deals specifically with arduino needs
 from data import Data
 from parameters import Cons, Vars
-
+from conditions import Positional, Behavioral, probability
 
 
 # Initialize communications
@@ -21,6 +21,10 @@ elif Vars.computerType == 'Pi':
 	data = Data(arduino, Vars.logFilePi)
 elif Vars.computerType == 'Mac':
 	data = Data(arduino, Vars.logFileMac)
+
+posit = Positional(data)
+behave = Behavioral(data)
+
 try:
 	print '\nThank you for choosing MouselabRig. We hope you find this experience' \
 	 'enjoyable.\nIf you didn\'t update the parameters for this experiment, quit ' \
@@ -55,14 +59,12 @@ while arduino.isOpen():
 			data.displayData()
 			arduino.sendMsg = True
 			data.logData()
-			
-
-		if (data.index > 1):
-			if (data.realLaps[data.index - 1] > data.realLaps[data.index - 2]):
-				if data.realPosition[data.index - 1] > 100:
-					arduino.openValve(100)
-
-
+		
+		if data.index > 1:
+			if posit.newLap():
+				
+				if probability(Vars.probability):
+					arduino.openValve(Vars.valveOpenMillis)
 		
 
 	except OSError:

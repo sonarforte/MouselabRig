@@ -48,7 +48,7 @@ class Data:
 			self.outFile.write(Vars.params + '\n')
 			ref = 'Index, Time, Displacement, Velocity, Acceleration, ' \
 				  'Real_Position, Real_Laps, Virtual_Position, ' \
-				  'Virtual_Laps, Valve_State\n'
+				  'Virtual_Laps, Valve_State, Trials, Successes\n'
 			self.outFile.write(ref)
 
 
@@ -217,16 +217,16 @@ class Data:
 
 	def displayData( self ):
 		'''Prints values to the screen.'''
-		n = self.index - 1
+		
 
 		print 'Time:			', self.humanTime 	         
-		print 'Displacement:		', self.displacement[n]
-		print 'Velocity:		', self.velocity[n]
-		print 'Acceleration:		', self.acceleration[n]
-		print 'Real Position:		', self.realPosition[n]
+		print 'Displacement:		', self.displacement[-1]
+		print 'Velocity:		', self.velocity[-1]
+		print 'Acceleration:		', self.acceleration[-1]
+		print 'Real Position:		', self.realPosition[-1]
 		print 'Real Lap Count:		', self.numRealLaps
-		print 'Virtual Position:	', self.virtualPosition[n]
+		print 'Virtual Position:	', self.virtualPosition[-1]
 		print 'Virtual Lap Count:	', self.numVirtualLaps
 		print 'Number of Trials       ', self.trials
 		print 'Number of Successes    ', self.successes, '\n'
-		print 'Latency:				', self.latency[n]
+		print 'Latency:				', self.latency[-1], '\n'
