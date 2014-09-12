@@ -61,7 +61,7 @@ while arduino.isOpen():
 			data.logData()
 		
 		if data.index > 1:
-			if posit.newLap():
+			if gettatr(posit, 'newLap')():
 				
 				if probability(Vars.probability):
 					arduino.openValve(Vars.valveOpenMillis)
