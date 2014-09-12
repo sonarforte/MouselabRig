@@ -111,9 +111,11 @@ class Data:
 			self.latency.append(deltaT)
 
 		seconds = millis / 1000.0
-		minutes = int(math.floor(seconds / 60.0))
+		minutes = float(math.floor(seconds / 60.0))
+		minutes = '{:02.0f}'.format(minutes)
 		seconds = seconds % 60
-		self.humanTime = '{0}:{1}'.format(minutes, seconds)
+		seconds = '{:05.2f}'.format(seconds)
+		self.humanTime = minutes + ':' + seconds
 
 
 
@@ -227,3 +229,4 @@ class Data:
 		print 'Virtual Lap Count:	', self.numVirtualLaps
 		print 'Number of Trials       ', self.trials
 		print 'Number of Successes    ', self.successes, '\n'
+		print 'Latency:				', self.latency[n]
