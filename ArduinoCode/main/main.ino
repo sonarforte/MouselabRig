@@ -19,10 +19,7 @@ extern "C" {
 /*----------------------------Global Declarations-----------------------------------------
 ----------------------------------------------------------------------------------------*/
 
-
-unsigned long lastTime = 0;
-
-// volatile boolean sendMsg = false;	// send message flag - write true if new info to send
+// Global Variables accessed by main program or updated by sensors
 char ardMsg[100];
 unsigned long msgNo = 0;
 
@@ -32,29 +29,32 @@ volatile boolean sendMsg = true;
 unsigned long closeTime = 0; 
 
 
-/*-------------------------Helper FCNs--------------------------------------------
---------------------------------------------------------------------------------*/
+/*-------------------------Helper FCNs----------------------------------------------------
+----------------------------------------------------------------------------------------*/
 
 
-// sendSensorData - Prints sensor information to serial data stream 
-// Headed with "ARD" and terminated with newline
+/* sendSensorData - Sends time-stamped sensor information to serial data stream 
+Prints format string with most recent sensor values. Only called after a message from Pi 
+has been received and processed. Resets sendMsg flag upon completion */
 void sendSensorData( void ) {
 
-	// Format message string and send to Pi
+	/* Format message string into 64 byte char arry ardMsg. Prefer variables to function 
+	calls - saves time and doesn't miss crucial information from sensors. */
+	snprintf(ardMsg, 64, "ARD,N,%lu,MS,%lu,PS,%d,TKS,%ld,VAL,%d,\n", msgNo, millis(), 
+			 photoState, ticks, valveState); 
 	
-	snprintf(ardMsg, 64, 
-		"ARD,N,%lu,MS,%lu,PS,%d,TKS,%ld,VAL,%d,\n", 
-		msgNo, millis(), photoState, ticks, valveState); 
-	while(Serial.available()) Serial.read();
-	Serial.print(ardMsg);
-	msgNo++;
+	while(Serial.available()) Serial.read();		// flush the incoming buffer--delete?
+	
+	Serial.print(ardMsg);		// send the message over serial
+	msgNo++;					// increment the number of messages sent
 	sendMsg = false;			// reset outgoing message flag
 		
 }
 
-// Called when there is incoming information from the Pi
-// Returns true for valid message, false otherwise
-// Supports messages under 100 characters, with under 10 comma-separated keywords, that ends in '\n' 
+/* processPiData - Receives serial data from buffer and interprets properly formatted (see
+documentation) instructions from Pi. Reads string and pulls out data flags and parses out
+the values for each flag. Calls the proper routines depending on value of data received. 
+First routine called after new data has been identified. */
 void processPiData( void ) {
 
 	char piMsg[64];
@@ -113,10 +113,10 @@ void processPiData( void ) {
 }
 
 
-/*-----------------------Setup & Main----------------------------------------------
----------------------------------------------------------------------------------*/
+/*-----------------------Setup & Main-----------------------------------------------------
+----------------------------------------------------------------------------------------*/
 
-/* Setup routine. Run once upon Arduino startup and contains configuration settings 
+/* setup - Run once upon Arduino startup and contains configuration settings 
 for the hardware on the chip and boar. Initializes pins for I/O and sets up  interrupts. */
 void setup() {
 
@@ -157,7 +157,7 @@ Shuts off the valve at the end of the loop if its open duration has expired. */
 void loop() {
 	
 	/* Send new data if it's Arduino's turn to message Pi	
-	Test the sendMsg flag (only set upon successful parsing by processPiData()) */
+	zTest the sendMsg flag (only set upon successful parsing by processPiData()) */
 	if (sendMsg) {
 		
 		/* Send the most recent sensor values which have been updated 

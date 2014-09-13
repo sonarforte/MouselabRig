@@ -70,12 +70,14 @@ class Vars:
 	## the experiment will continue indefinitely.
 	## If both are true, the experiment will stop at whichever marker comes
 	## first.
-	## Do you want the experiment to end after a certain number of trials?
-	endAfterTrials = False
-	numberOfTrials = 1
+	## Do you want the experiment to end after a certain number of successes?
+	## The experiment will only end after the mouse has passed all the 
+	## conditions the specified number of times.
+	endAfterSuccesses = True
+	numberOfSuccesses = 10
 
 	## Do you want the experiment to end after a certain time (minutes)?
-	endAfterTime = True
+	endAfterTime = False
 	endTime = 1
 
 
@@ -124,13 +126,13 @@ class Vars:
 			  'accelerationOverTime', 'accelerationOverDistance', \
 			  'isVelocity', 'wasVelocityTimeAgo', 'wasVelocityDistanceAgo']
 
-	behavioral1 = methods[4]
+	behavioral1 = methods[0]
 	behavioral2 = methods[0]
 	behavioral3 = methods[0]
 
 	# After the test has been passed, the release of water is determined with
 	# the probability defined below. Set to 1 for water to always be released.
-	probability = 1 		# 0 <= p <= 1
+	probability = .5 		# 0 <= p <= 1
 
 
 	# Arguments for conditions

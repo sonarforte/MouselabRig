@@ -5,26 +5,57 @@
 # 2014-09-12
 
 import random
+import math
 from parameters import Cons, Vars
 
 
-def probability( p = 1 ):
+class Probability:
 	'''Returns true p * 100 percent of the time.
 
 	Uses a pseudo-random probability distribution to determine probabalistic experiments. 
 	0 <= p <= 1'''
 
-	
-	if p >= 1 :
-		return True
-	if p < 0 : 
-		return False
+	def __init__( self ):
 
-	value = random.random()
-	if value <= p :
-		return True
-	else :
-		return False 
+
+		self.p = Vars.probability
+		if self.p >= 1:
+			self.p = 1
+		if self.p < 0: 
+			self.p = 0
+
+		self.timesCalled = 0
+		if Vars.endAfterSuccesses:
+			self.__predeterminedProb()
+		
+
+	def __randomProb( self ):
+
+		value = random.random()
+		if value <= self.p:
+			return True
+		else:
+			return False 
+
+
+	def __predeterminedProb( self ):
+
+		rewards = int(self.p * Vars.numberOfSuccesses)
+		noRewards = Vars.numberOfSuccesses - rewards
+		dist = [True for x in range(rewards)]
+		dist.extend([False for x in range(noRewards)])
+		random.shuffle(dist)
+		self.pDistribution = dist
+
+
+	def probability( self ):
+
+		if hasattr(self, 'pDistribution'):
+			self.timesCalled += 1
+			return self.pDistribution[self.timesCalled - 1]
+		else:
+			self.timesCalled += 1
+			return self.__randomProb()
 
 
 
@@ -336,7 +367,6 @@ class Behavioral:
 			if abs(avgAcc - testAccel) <= threshold:
 				return True
 			return False
-
 
 
 	def isVelocity( self ):

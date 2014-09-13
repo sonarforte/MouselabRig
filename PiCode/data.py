@@ -41,6 +41,7 @@ class Data:
 
 		self.trials = 0
 		self.successes = 0
+		self.rewards = 0
 
 		if Vars.wantToLog:
 			self.outFile = open(filePath, 'w')
@@ -49,7 +50,7 @@ class Data:
 			self.outFile.write(Vars.params + '\n')
 			ref = 'Index, Time, Displacement, Velocity, Acceleration, ' \
 				  'Real_Position, Real_Laps, Virtual_Position, ' \
-				  'Virtual_Laps, Valve_State, Trials, Successes\n'
+				  'Virtual_Laps, Valve_State, Trials, Successes, Rewards\n'
 			self.outFile.write(ref)
 
 
@@ -208,11 +209,11 @@ class Data:
 		# of the log file should be modified to reflect those changes as well
 		# The code for the legend is in self.__init__() (above)
 		line = 'N,{0},T,{1},X,{2},V,{3},A,{4},RP,{5},RL,{6},VP,{7},' \
-			   'VL,{8},VAL,{9},TRI,{10},SUC,{11},\n'.format(n, self.time[n], 
+			   'VL,{8},VAL,{9},TRI,{10},SUC,{11},REW,{12},\n'.format(n, self.time[n], 
 			   self.displacement[n], self.velocity[n], self.acceleration[n],
 			   self.realPosition[n], self.numRealLaps, self.virtualPosition[n],
 			   self.numVirtualLaps, self.valveState, self.trials, 
-			   self.successes)
+			   self.successes, self.rewards)
 
 		self.outFile.write(line)
 
@@ -229,16 +230,17 @@ class Data:
 		print 'Virtual Position:	', self.virtualPosition[-1]
 		print 'Virtual Lap Count:	', self.numVirtualLaps
 		print 'Number of Trials       ', self.trials
-		print 'Number of Successes    ', self.successes, '\n'
-		print 'Latency:				', self.latency[-1], '\n'
+		print 'Number of Successes    ', self.successes 
+		print 'Number of Rewards 	', self.rewards, '\n'
+		# print 'Latency:				', self.latency[-1], '\n'
 
 	def endExperiment( self ):
 		'''Ends the experiment according to the settings in parameters.py
 
 		Ends at whichever comes first-- time elapsed or number of trials.'''
 
-		if Vars.endAfterTrials:
-			if self.trials >= Vars.numberOfTrials:
+		if Vars.endAfterSuccesses:
+			if self.successes >= Vars.numberOfSuccesses:
 				return True
 		if Vars.endAfterTime:
 			if self.minutes >= Vars.endTime:

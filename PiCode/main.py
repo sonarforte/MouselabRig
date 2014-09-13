@@ -9,7 +9,7 @@ import sys
 from arduino import Arduino 	# subclass of pySerial deals specifically with arduino needs
 from data import Data
 from parameters import Cons, Vars
-from conditions import Positional, Behavioral, probability
+from conditions import Positional, Behavioral, Probability
 
 
 # Initialize communications
@@ -24,6 +24,7 @@ elif Vars.computerType == 'Mac':
 
 posit = Positional(data)
 behave = Behavioral(data)
+prob = Probability()
 
 try:
 	print '\nThank you for choosing MouselabRig. We hope you find this experience' \
@@ -58,15 +59,16 @@ try:
 			arduino.sendMsg = True
 			data.logData()
 		
-		if data.index > 0:
-			if getattr(posit, Vars.positional)():
-				data.trials += 1
-				if getattr(behave, Vars.behavioral1)():
-					if getattr(behave, Vars.behavioral2)():
-						if getattr(behave, Vars.behavioral3)():
-							data.successes += 1
-							if probability(Vars.probability):
-								arduino.openValve(Vars.valveOpenMillis)
+			if data.index > 0:
+				if getattr(posit, Vars.positional)():
+					data.trials += 1
+					if getattr(behave, Vars.behavioral1)():
+						if getattr(behave, Vars.behavioral2)():
+							if getattr(behave, Vars.behavioral3)():
+								data.successes += 1
+								if prob.probability():
+									data.rewards += 1
+									arduino.openValve(Vars.valveOpenMillis)
 		
 		if data.endExperiment():
 			raise KeyboardInterrupt
