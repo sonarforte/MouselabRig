@@ -66,6 +66,19 @@ class Vars:
 	logFileMac = '/Users/name/Documents/log.txt'
 	
 
+	## Choose when you want the experiment to end. If both options are false,
+	## the experiment will continue indefinitely.
+	## If both are true, the experiment will stop at whichever marker comes
+	## first.
+	## Do you want the experiment to end after a certain number of trials?
+	endAfterTrials = False
+	numberOfTrials = 100
+
+	## Do you want the experiment to end after a certain time (minutes)?
+	endAfterTime = True
+	endTime = 1
+
+
 	# Params gets printed to the log file once at the beginning of each 
 	# experiment. Include information from this file that you would like
 	# to have for later reference. For info about the syntax, look at python's

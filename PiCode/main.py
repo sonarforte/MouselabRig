@@ -68,6 +68,9 @@ try:
 							if probability(Vars.probability):
 								arduino.openValve(Vars.valveOpenMillis)
 		
+		if data.endExperiment():
+			raise KeyboardInterrupt
+		
 
 except OSError:
 

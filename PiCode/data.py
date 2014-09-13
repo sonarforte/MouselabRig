@@ -19,6 +19,7 @@ class Data:
 		self.arduino = arduinoObj
 		self.startTime = 0
 		self.time = []
+		self.minutes = 0
 		self.photoState = 0
 		
 		self.numRealLaps = 0
@@ -111,8 +112,8 @@ class Data:
 			self.latency.append(deltaT)
 
 		seconds = millis / 1000.0
-		minutes = float(math.floor(seconds / 60.0))
-		minutes = '{:02.0f}'.format(minutes)
+		self.minutes = float(math.floor(seconds / 60.0))
+		minutes = '{:02.0f}'.format(self.minutes)
 		seconds = seconds % 60
 		seconds = '{:05.2f}'.format(seconds)
 		self.humanTime = minutes + ':' + seconds
@@ -230,3 +231,16 @@ class Data:
 		print 'Number of Trials       ', self.trials
 		print 'Number of Successes    ', self.successes, '\n'
 		print 'Latency:				', self.latency[-1], '\n'
+
+	def endExperiment( self ):
+		'''Ends the experiment according to the settings in parameters.py
+
+		Ends at whichever comes first-- time elapsed or number of trials.'''
+
+		if Vars.endAfterTrials:
+			if self.trials >= Vars.numberOfTrials:
+				return True
+		if Vars.endAfterTime:
+			if self.minutes >= Vars.endTime:
+				return True
+		return False
