@@ -134,59 +134,209 @@ class Behavioral:
 
 
 	def velocityOverTime( self ):
-		'''Returns true if velocity is above Vars.minVelocity.
+		'''Returns true if the average velocity over time meets the specified 
+		condition.
 
-		Calculates average velocity from five most recent values and compares
-		that with the min velocity.'''
+		Finds the average velocity over a time interval starting at a specific
+		time in the past, and tests if it is above, below, or equal within a 
+		threshold to a specific value.
+		These four parameters can be specified in parameters.py.'''
 		
-		if self.data.index > 5:
-			avgVel = sum(self.data.velocity[-5:])
-			avgVel = avgVel / 5.0
-			if avgVel >= Vars.minVelocity:
+		testVelocity = Vars.velTime
+		test = Vars.velTimeTest
+		threshold = Vars.wasVelTimeThreshold
+		timeToCheck = Vars.wasVelTimeAgo
+		
+		listToCheck = self.data.time
+
+		startInterval = listToCheck[-1] - timeToCheck
+
+		# Stop executing condition if the desired time doesn't exist
+		if startInterval <= 0: 
+			self.data.trials -= 1
+			return False
+
+		try: 
+			i = -1
+			while listToCheck[i] > startInterval:
+				i -= 1
+				if listToCheck[i] == startInterval:
+					break
+			
+			velInterval = self.data.velocity[i:]
+			avgVel = sum(velInterval) / len(velInterval)
+
+		except IndexError:
+			self.data.trials -= 1
+			return False
+
+		if test == Cons.test_above:
+			if avgVel >= testVelocity:
 				return True
-		return False
+			return False
+		elif test == Cons.test_below:
+			if avgVel <= testVelocity:
+				return True
+			return False
+		elif test == Cons.test_equal:
+			if abs(avgVel - testVelocity) <= threshold:
+				return True
+			return False
+
 
 
 	def velocityOverDistance( self ):
-		'''Returns true if velocity is below Vars.maxVelocity.
+		'''Returns true if the average velocity over distanc meets the 
+		specified condition.
 
-		Calculates average velocity from five most recent values and compares
-		that with the min velocity.'''
+		Finds the average velocity over a displacement interval starting at 
+		a specific distance in the past, and tests if it is above, below, or
+		equal within a threshold to a specific value.
+		These four parameters can be specified in parameters.py.'''
 		
-		if self.data.index > 5:
-			avgVel = sum(self.data.velocity[-5:])
-			avgVel = avgVel / 5.0
-			if avgVel <= Vars.minVelocity:
+		testVelocity = Vars.velDist
+		test = Vars.velDistTest
+		threshold = Vars.velDistThreshold
+		dispToCheck = Vars.velDistAgo
+		
+		listToCheck = self.data.displacement
+
+		startInterval = listToCheck[-1] - dispToCheck
+
+		# Stop executing condition if the desired time doesn't exist
+		if startInterval <= 0: 
+			self.data.trials -= 1
+			return False
+
+		try: 
+			i = -1
+			while listToCheck[i] > startInterval:
+				i -= 1
+				if listToCheck[i] == startInterval:
+					break
+			
+			velInterval = self.data.velocity[i:]
+			avgVel = sum(velInterval) / len(velInterval)
+
+		except IndexError:
+			self.data.trials -= 1
+			return False
+
+		if test == Cons.test_above:
+			if avgVel >= testVelocity:
 				return True
-		return False
+			return False
+		elif test == Cons.test_below:
+			if avgVel <= testVelocity:
+				return True
+			return False
+		elif test == Cons.test_equal:
+			if abs(avgVel - testVelocity) <= threshold:
+				return True
+			return False
 
 
 	def accelerationOverTime( self ):
-		'''Returns true if acceleration is above Vars.minAcceleration.
+		'''Returns true if the average acceleration over time meets the 
+		specified condition.
 
-		Calculates average acceleration from two most recent values and compares
-		that with the min acceleration.'''
+		Finds the average acceleration over a time interval starting at a 
+		time in the past, and tests if it is above, below, or equal within a 
+		threshold to a specific value.
+		These four parameters can be specified in parameters.py.'''
 		
-		if self.data.index > 2:
-			avgAcc = sum(self.data.acceleration[-2:])
-			avgAcc = avgAcc / 2.0
-			if avgAcc >= Vars.minAcceleration:
+		testAccel = Vars.velTime
+		test = Vars.velTimeTest
+		threshold = Vars.wasVelTimeThreshold
+		timeToCheck = Vars.wasVelTimeAgo
+		
+		listToCheck = self.data.time
+
+		startInterval = listToCheck[-1] - timeToCheck
+
+		# Stop executing condition if the desired time doesn't exist
+		if startInterval <= 0: 
+			self.data.trials -= 1
+			return False
+
+		try: 
+			i = -1
+			while listToCheck[i] > startInterval:
+				i -= 1
+				if listToCheck[i] == startInterval:
+					break
+			
+			accInterval = self.data.acceleration[i:]
+			avgAcc = sum(accInterval) / len(accInterval)
+
+		except IndexError:
+			self.data.trials -= 1
+			return False
+
+		if test == Cons.test_above:
+			if avgAcc >= testAccel:
 				return True
-		return False
+			return False
+		elif test == Cons.test_below:
+			if avgAcc <= testAccel:
+				return True
+			return False
+		elif test == Cons.test_equal:
+			if abs(avgAcc - testAccel) <= threshold:
+				return True
+			return False
 
 
 	def accelerationOverDistance( self ):
-		'''Returns true if acceleration is below Vars.maxAcceleration.
+		'''Returns true if the average acceleration over distance meets the 
+		specified condition.
 
-		Calculates average acceleration from two most recent values and compares
-		that with the max acceleration.'''
+		Finds the average acceleration over a displacement interval starting 
+		at a specific distance in the past, and tests if it is above, below, 
+		or equal within a threshold to a specific value.
+		These four parameters can be specified in parameters.py.'''
 		
-		if self.data.index > 2:
-			avgAcc = sum(self.data.acceleration[-2:])
-			avgAcc = avgAcc / 2.0
-			if avgAcc <= Vars.maxAcceleration:
+		testAccel = Vars.accDist
+		test = Vars.accDistTest
+		threshold = Vars.accDistThreshold
+		dispToCheck = Vars.accDistAgo
+		
+		listToCheck = self.data.displacement
+
+		startInterval = listToCheck[-1] - dispToCheck
+
+		# Stop executing condition if the desired time doesn't exist
+		if startInterval <= 0: 
+			self.data.trials -= 1
+			return False
+
+		try: 
+			i = -1
+			while listToCheck[i] > startInterval:
+				i -= 1
+				if listToCheck[i] == startInterval:
+					break
+			
+			accInterval = self.data.acceleration[i:]
+			avgAcc = sum(accInterval) / len(accInterval)
+
+		except IndexError:
+			self.data.trials -= 1
+			return False
+
+		if test == Cons.test_above:
+			if avgAcc >= testAccel:
 				return True
-		return False
+			return False
+		elif test == Cons.test_below:
+			if avgAcc <= testAccel:
+				return True
+			return False
+		elif test == Cons.test_equal:
+			if abs(avgAcc - testAccel) <= threshold:
+				return True
+			return False
+
 
 
 	def isVelocity( self ):
@@ -279,9 +429,6 @@ class Behavioral:
 		Finds the velocity at a specific distance in the past, and tests if 
 		it is above, below, or equal within a threshold to a specific value.
 		These four parameters can be specified in parameters.py.'''
-		# Problem - if mouse stops running in a short enough time, his 
-		# velocity at the past displacement will stay the same for subsequent
-		# tests because displacement hasnt changed.
 
 		testVelocity = Vars.wasVelDist
 		test = Vars.wasVelDistTest

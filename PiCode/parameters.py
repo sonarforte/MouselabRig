@@ -10,7 +10,7 @@ class Cons:
 	Do not modify unless you know what you are doing, as these will affect calculation accuracy
 	and changing them may result in useless data''' 
 	
-	# Constants
+	## Constants
 	encoder_model_A02 = 500		# pulses per revolution for HEDS-5540-A02
 	encoder_model_C02 = 100		# pulses per revolution for HEDS-5540-C02
 	wheel_radius = 5 			# radius of rig wheel (cm)
@@ -29,10 +29,10 @@ class Vars:
 	Comment out '''
 	
 
-	# Multiple-Choice Variables
-	# Comment out (CTRL-/ on Linux) all but one line from each group
+	## Multiple-Choice Variables
+	## Comment out (CTRL-/ on Linux) all but one line from each group
 	
-	# Set True if you want the experiment to be run with a virtual lap (define length below)
+	## Set True if you want the experiment to be run with a virtual lap (define length below)
 	# virtualLaps = False
 	virtualLaps = True
 
@@ -42,7 +42,7 @@ class Vars:
 	# encoderPPR = Cons.encoder_model_C02
 	
 
-	# Which computer are you running Mouselabrig from?
+	## Which computer are you running Mouselabrig from?
 	computerType = 'Linux'
 	# computerType = 'Pi'
 	# computerType = 'Mac'
@@ -111,7 +111,7 @@ class Vars:
 			  'accelerationOverTime', 'accelerationOverDistance', \
 			  'isVelocity', 'wasVelocityTimeAgo', 'wasVelocityDistanceAgo']
 
-	behavioral1 = methods[-3]
+	behavioral1 = methods[4]
 	behavioral2 = methods[0]
 	behavioral3 = methods[0]
 
@@ -140,30 +140,31 @@ class Vars:
 	randDispUpper = 100
 
 
-
-
-
 	## Parameters for behavioral conditions
 
 	## velocityOverTime()
-	velTime = 15 			# cm/s
-	velTimeTest = Cons.test_above
-	velTimeThreshold = 1
+	velTime = 0 			# cm/s
+	velTimeTest = Cons.test_equal
+	velTimeThreshold = 5
+	velTimeAgo = 1000
 
 	## velocityOverDistance()
-	velDist = 15 			# cm/s
-	velDistTest = Cons.test_above
-	velDistThreshold = 1
+	velDist = 0 			# cm/s
+	velDistTest = Cons.test_equal
+	velDistThreshold = 5
+	velDistAgo = 5
 
 	## accelerationOverTime()
-	accTime = 15 			# cm/s
-	accTimeTest = Cons.test_above
-	accTimeThreshold = 1
+	accTime = 0 			# cm/s^2
+	accTimeTest = Cons.test_equal
+	accTimeThreshold = 15
+	accTimeAgo = 2000
 
 	## accelerationOverDistance()
-	accDist = 15 			# cm/s
-	accDistTest = Cons.test_above
-	accDistThreshold = 1
+	accDist = 0 			# cm/s^2
+	accDistTest = Cons.test_equal
+	accDistThreshold = 5
+	accDistAgo = 5
 
 	## isVelocity()
 	isVel = 0 		# cm/s
