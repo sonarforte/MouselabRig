@@ -91,8 +91,8 @@ class Vars:
 	## (written as a string).
 	## A successful test of this condition will result in the 'trials' 
 	## counter being incremented by one.
-	positional = 'timeElapsed'
-	# positional = 'newLap'
+	# positional = 'timeElapsed'
+	positional = 'newLap'
 	# positional = 'randomTimeElapsed'
 	# positional = 'randomDisplacement'
 	## Warning - Setting to none means the condition is always true
@@ -111,7 +111,7 @@ class Vars:
 			  'accelerationOverTime', 'accelerationOverDistance', \
 			  'isVelocity', 'wasVelocityTimeAgo', 'wasVelocityDistanceAgo']
 
-	behavioral1 = methods[6]
+	behavioral1 = methods[-3]
 	behavioral2 = methods[0]
 	behavioral3 = methods[0]
 
@@ -166,13 +166,13 @@ class Vars:
 	accDistThreshold = 1
 
 	## isVelocity()
-	isVel = 15 		# cm/s
-	isVelTest = Cons.test_above
-	isVelThreshold = 1 				
+	isVel = 0 		# cm/s
+	isVelTest = Cons.test_equal
+	isVelThreshold = 5 				
 
 	## wasVelocityTimeAgo()
 	wasVelTime = 10
-	wasVelTimeTest = Cons.test_equal
+	wasVelTimeTest = Cons.test_above
 	wasVelTimeThreshold = 5
 	wasVelTimeAgo = 3000
 
@@ -180,4 +180,4 @@ class Vars:
 	wasVelDist = 15
 	wasVelDistTest = Cons.test_above
 	wasVelDistThreshold = 1
-	wasVelDistAgo = 5
+	wasVelDistAgo = 10

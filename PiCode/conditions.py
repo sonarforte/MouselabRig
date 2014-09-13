@@ -196,29 +196,32 @@ class Behavioral:
 		a specific value. These three parameters can be specified in 
 		parameters.py.'''
 
+		testVelocity = Vars.isVel
+		test = Vars.isVelTest
+		threshold = Vars.isVelThreshold
+
+
 		# Use an average velocity from five consecutive values to reduce the 
 		# effect of anomalies
-		if self.data.index > 5:
-			avgVel = sum(self.data.velocity[-5:])
-			avgVel = avgVel / 5.0
-			if Vars.isVelTest == Cons.test_above:
-				if avgVel >= isVel:
+		if self.data.index > 3:
+			avgVel = sum(self.data.velocity[-3:])
+			avgVel = avgVel / 3.0
+			if test == Cons.test_above:
+				if avgVel >= testVelocity:
 					return True
 				return False
-			if Vars.isVelTest == Cons.test_below:
-				if avgVel <= isVel:
+			if test == Cons.test_below:
+				if avgVel <= testVelocity:
 					return True
 				return False
-			if Vars.isVelTest == Cons.testEqual:
-				if abs(avgVel - Vars.isVel) <= Vars.isVelThreshold:
+			if test == Cons.test_equal:
+				if abs(avgVel - testVelocity) <= threshold:
 					return True
 				return False
 		
 		# Reduce trials which were incremented when positional returned true
 		self.data.trials -= 1 	
 		return False
-
-
 
 
 	def wasVelocityTimeAgo( self ):
@@ -228,60 +231,46 @@ class Behavioral:
 		it is above, below, or equal within a threshold to a specific value.
 		These four parameters can be specified in parameters.py.'''
 
-		pastTime = self.data.time[-1] - Vars.wasVelTimeAgo
+		testVelocity = Vars.wasVelTime
+		test = Vars.wasVelTimeTest
+		threshold = Vars.wasVelTimeThreshold
+		timeToCheck = Vars.wasVelTimeAgo
+		
+		listToCheck = self.data.time
+
+		pastTime = listToCheck[-1] - timeToCheck
 
 		# Stop executing condition if the desired time doesn't exist
 		if pastTime <= 0: 
 			self.data.trials -= 1
 			return False
 
-		i = -1
-		while self.data.time[i] > pastTime:
-			if len(self.data.time) + i > 100:
-				i -= 100
-			elif len(self.data.time) + i > 10:
-				i -= 10
-			elif len(self.data.time) + i > 1:
+		try: 
+			i = -1
+			while listToCheck[i] > pastTime:
 				i -= 1
-			if self.data.time[i] == pastTime:
-				break
-		while self.data.time[i] < pastTime:
-			if i < -11:
-				i += 10
-			elif i < -2:
-				i += 1
-			if self.data.time[i] == pastTime:
-				break
-		while self.data.time[i] > pastTime:
-			if len(self.data.time) + i > 1:
-				i -= 1
-			if self.data.time[i] == pastTime:
-				break
+				if listToCheck[i] == pastTime:
+					break
+			
+			oldVel = sum(self.data.velocity[i - 1:i + 2])
+			oldVel = oldVel / 3.0
 
-		oldVel = self.data.velocity[i]
-
-		if Vars.wasVelTimeTest == Cons.test_above:
-			if oldVel >= Vars.wasVelTime:
-				return True
-			return False
-		elif Vars.wasVelTimeTest == Cons.test_below:
-			if oldVel <= Vars.wasVelTime:
-				return True
-			return False
-		elif Vars.wasVelTimeTest == Cons.test_equal:
-			if abs(oldVel - Vars.wasVelTime) <= Vars.wasVelTimeThreshold:
-				return True
+		except IndexError:
+			self.data.trials -= 1
 			return False
 
-
-
-
-		
-
-
-
-
-
+		if test == Cons.test_above:
+			if oldVel >= testVelocity:
+				return True
+			return False
+		elif test == Cons.test_below:
+			if oldVel <= testVelocity:
+				return True
+			return False
+		elif test == Cons.test_equal:
+			if abs(oldVel - testVelocity) <= threshold:
+				return True
+			return False
 
 
 	def wasVelocityDistanceAgo( self ):
@@ -290,4 +279,47 @@ class Behavioral:
 		Finds the velocity at a specific distance in the past, and tests if 
 		it is above, below, or equal within a threshold to a specific value.
 		These four parameters can be specified in parameters.py.'''
-		pass
+		# Problem - if mouse stops running in a short enough time, his 
+		# velocity at the past displacement will stay the same for subsequent
+		# tests because displacement hasnt changed.
+
+		testVelocity = Vars.wasVelDist
+		test = Vars.wasVelDistTest
+		threshold = Vars.wasVelDistThreshold
+		dispToCheck = Vars.wasVelDistAgo
+		
+		listToCheck = self.data.displacement
+
+		pastDisp = listToCheck[-1] - dispToCheck
+
+		# Stop executing condition if the desired time doesn't exist
+		if pastDisp <= 0: 
+			self.data.trials -= 1
+			return False
+
+		try: 
+			i = -1
+			while listToCheck[i] > pastDisp:
+				i -= 1
+				if listToCheck[i] == pastDisp:
+					break
+			
+			oldVel = sum(self.data.velocity[i - 1:i + 2])
+			oldVel = oldVel / 3.0
+
+		except IndexError:
+			self.data.trials -= 1
+			return False
+
+		if test == Cons.test_above:
+			if oldVel >= testVelocity:
+				return True
+			return False
+		elif test == Cons.test_below:
+			if oldVel <= testVelocity:
+				return True
+			return False
+		elif test == Cons.test_equal:
+			if abs(oldVel - testVelocity) <= threshold:
+				return True
+			return False

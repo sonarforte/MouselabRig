@@ -44,11 +44,9 @@ arduino.resetArd()
 
 print "ready"
 
-lastTime1 = 0
-lastTime2 = 0
-while arduino.isOpen():
 
-	try:
+try:
+	while arduino.isOpen():
 		
 		arduino.requestMsg()
 
@@ -71,17 +69,17 @@ while arduino.isOpen():
 								arduino.openValve(Vars.valveOpenMillis)
 		
 
-	except OSError:
+except OSError:
 
-		print "Why is there an OSError? Possibly because you reset the arduino?"
-		time.sleep(2)
-	
-	except IOError:
+	print "Why is there an OSError? Possibly because you reset the arduino?"
+	time.sleep(2)
 
-		print "Plug the arduino back in"
-		time.sleep(2)
+except IOError:
 
-	except KeyboardInterrupt:
+	print "Plug the arduino back in"
+	time.sleep(2)
 
-		data.outFile.close()
-		sys.exit('\nExperiment concluded. Now have fun analyzing all that data!')
+except KeyboardInterrupt:
+
+	data.outFile.close()
+	sys.exit('\nExperiment concluded. Have fun analyzing all that data.')
