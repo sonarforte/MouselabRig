@@ -123,6 +123,7 @@ class Behavioral:
 
 		self.data = dataObject
 
+
 	def none( self ):
 		'''Returns true.
 
@@ -131,7 +132,8 @@ class Behavioral:
 
 		return True
 
-	def isAboveVelocity( self ):
+
+	def velocityOverTime( self ):
 		'''Returns true if velocity is above Vars.minVelocity.
 
 		Calculates average velocity from five most recent values and compares
@@ -145,7 +147,7 @@ class Behavioral:
 		return False
 
 
-	def isBelowVelocity( self ):
+	def velocityOverDistance( self ):
 		'''Returns true if velocity is below Vars.maxVelocity.
 
 		Calculates average velocity from five most recent values and compares
@@ -159,7 +161,7 @@ class Behavioral:
 		return False
 
 
-	def isAboveAcceleration( self ):
+	def accelerationOverTime( self ):
 		'''Returns true if acceleration is above Vars.minAcceleration.
 
 		Calculates average acceleration from two most recent values and compares
@@ -173,7 +175,7 @@ class Behavioral:
 		return False
 
 
-	def isBelowAcceleration( self ):
+	def accelerationOverDistance( self ):
 		'''Returns true if acceleration is below Vars.maxAcceleration.
 
 		Calculates average acceleration from two most recent values and compares
@@ -186,8 +188,106 @@ class Behavioral:
 				return True
 		return False
 
-	def isStopped( self ):
-		'''Returns true if velocity is zero.
 
-		A tolerance for velocity variance can be specified in the 
-		parameters.'''
+	def isVelocity( self ):
+		'''Returns true if the current velocity meets the specified condition.
+
+		Tests if the velocity is above, below, or equal within a threshold to
+		a specific value. These three parameters can be specified in 
+		parameters.py.'''
+
+		# Use an average velocity from five consecutive values to reduce the 
+		# effect of anomalies
+		if self.data.index > 5:
+			avgVel = sum(self.data.velocity[-5:])
+			avgVel = avgVel / 5.0
+			if Vars.isVelTest == Cons.test_above:
+				if avgVel >= isVel:
+					return True
+				return False
+			if Vars.isVelTest == Cons.test_below:
+				if avgVel <= isVel:
+					return True
+				return False
+			if Vars.isVelTest == Cons.testEqual:
+				if abs(avgVel - Vars.isVel) <= Vars.isVelThreshold:
+					return True
+				return False
+		
+		# Reduce trials which were incremented when positional returned true
+		self.data.trials -= 1 	
+		return False
+
+
+
+
+	def wasVelocityTimeAgo( self ):
+		'''Returns true if a past velocity meets the specified condition.
+
+		Finds the velocity at a specific time in the past, and tests if 
+		it is above, below, or equal within a threshold to a specific value.
+		These four parameters can be specified in parameters.py.'''
+
+		pastTime = self.data.time[-1] - Vars.wasVelTimeAgo
+
+		# Stop executing condition if the desired time doesn't exist
+		if pastTime <= 0: 
+			self.data.trials -= 1
+			return False
+
+		i = -1
+		while self.data.time[i] > pastTime:
+			if len(self.data.time) + i > 100:
+				i -= 100
+			elif len(self.data.time) + i > 10:
+				i -= 10
+			elif len(self.data.time) + i > 1:
+				i -= 1
+			if self.data.time[i] == pastTime:
+				break
+		while self.data.time[i] < pastTime:
+			if i < -11:
+				i += 10
+			elif i < -2:
+				i += 1
+			if self.data.time[i] == pastTime:
+				break
+		while self.data.time[i] > pastTime:
+			if len(self.data.time) + i > 1:
+				i -= 1
+			if self.data.time[i] == pastTime:
+				break
+
+		oldVel = self.data.velocity[i]
+
+		if Vars.wasVelTimeTest == Cons.test_above:
+			if oldVel >= Vars.wasVelTime:
+				return True
+			return False
+		elif Vars.wasVelTimeTest == Cons.test_below:
+			if oldVel <= Vars.wasVelTime:
+				return True
+			return False
+		elif Vars.wasVelTimeTest == Cons.test_equal:
+			if abs(oldVel - Vars.wasVelTime) <= Vars.wasVelTimeThreshold:
+				return True
+			return False
+
+
+
+
+		
+
+
+
+
+
+
+
+	def wasVelocityDistanceAgo( self ):
+		'''Returns true if a past velocity meets the specified condition.
+
+		Finds the velocity at a specific distance in the past, and tests if 
+		it is above, below, or equal within a threshold to a specific value.
+		These four parameters can be specified in parameters.py.'''
+		pass

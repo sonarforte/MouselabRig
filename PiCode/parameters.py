@@ -17,6 +17,11 @@ class Cons:
 	belt_length = 137 			# circumfrence of belt (cm)
 	baud_rate = 115200
 
+	test_above = 1
+	test_below = -1
+	test_equal = 0
+
+
 class Vars:
 
 	'''Defines all the variables that determine the conditional reward system.
@@ -86,32 +91,33 @@ class Vars:
 	## (written as a string).
 	## A successful test of this condition will result in the 'trials' 
 	## counter being incremented by one.
-	# positional = 'timeElapsed'
-	positional = 'newLap'
+	positional = 'timeElapsed'
+	# positional = 'newLap'
 	# positional = 'randomTimeElapsed'
 	# positional = 'randomDisplacement'
 	## Warning - Setting to none means the condition is always true
 	# positional = 'none'	
 
-	# Specify the behavioral conditions to be tested. They will execute in 
-	# order. If you do not want all conditions to be tested, define them as
-	# <none> in this list. E.g. behavioral3 = none
-	# These conditions test mouse behavior and are called only if the 
-	# positional requirement from the positonal condition specified above is 
-	# met. A successful complettion of these conditions will result in the 
-	# 'successes' variable to be incremented. 
-	# Whether the water is released at this point, however, is determined by 
-	# the probability set for the experiment (below). 
-	methods = ['none', 'isAboveVelocity', 'isBelowVelocity', \
-			  'isAboveAcceleration', 'isBelowAcceleration']
+	## Specify the behavioral conditions to be tested. They will execute in 
+	## order. If you do not want all conditions to be tested, define them as
+	## <none> in this list. E.g. behavioral3 = none
+	## These conditions test mouse behavior and are called only if the 
+	## positional requirement from the positonal condition specified above is 
+	## met. A successful complettion of these conditions will result in the 
+	## 'successes' variable to be incremented. 
+	## Whether the water is released at this point, however, is determined by 
+	## the probability set for the experiment (below). 
+	methods = ['none', 'velocityOverTime', 'velocityOverDistance', \
+			  'accelerationOverTime', 'accelerationOverDistance', \
+			  'isVelocity', 'wasVelocityTimeAgo', 'wasVelocityDistanceAgo']
 
-	behavioral1 = methods[0]
+	behavioral1 = methods[6]
 	behavioral2 = methods[0]
 	behavioral3 = methods[0]
 
 	# After the test has been passed, the release of water is determined with
 	# the probability defined below. Set to 1 for water to always be released.
-	probability = .8 		# 0 <= p <= 1
+	probability = 1 		# 0 <= p <= 1
 
 
 	# Arguments for conditions
@@ -119,7 +125,7 @@ class Vars:
 	# Set the relevent parameters for each condition method below
 
 	# timeElapsed()
-	elapsedTime = 5000		# interval for timeElapsed() to return true (ms)
+	elapsedTime = 1000		# interval for timeElapsed() to return true (ms)
 	
 
 	# randomTimeElapsed()
@@ -139,14 +145,39 @@ class Vars:
 
 	## Parameters for behavioral conditions
 
-	## isAboveVelocity()
-	minVelocity = 15 			# cm/s
+	## velocityOverTime()
+	velTime = 15 			# cm/s
+	velTimeTest = Cons.test_above
+	velTimeThreshold = 1
 
-	## isBelowVelocity()
-	maxVelocity = 15 			# cm/s
+	## velocityOverDistance()
+	velDist = 15 			# cm/s
+	velDistTest = Cons.test_above
+	velDistThreshold = 1
 
-	## isAboveAcceleration()
-	minAcceleration = .1 		#cm/s^2
+	## accelerationOverTime()
+	accTime = 15 			# cm/s
+	accTimeTest = Cons.test_above
+	accTimeThreshold = 1
 
-	## isBelowAcceleration()
-	maxAcceleration = .1 		# cm/s^2
+	## accelerationOverDistance()
+	accDist = 15 			# cm/s
+	accDistTest = Cons.test_above
+	accDistThreshold = 1
+
+	## isVelocity()
+	isVel = 15 		# cm/s
+	isVelTest = Cons.test_above
+	isVelThreshold = 1 				
+
+	## wasVelocityTimeAgo()
+	wasVelTime = 10
+	wasVelTimeTest = Cons.test_equal
+	wasVelTimeThreshold = 5
+	wasVelTimeAgo = 3000
+
+	## wasVelocityDistanceAgo()
+	wasVelDist = 15
+	wasVelDistTest = Cons.test_above
+	wasVelDistThreshold = 1
+	wasVelDistAgo = 5
