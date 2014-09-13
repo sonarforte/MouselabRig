@@ -72,7 +72,7 @@ class Vars:
 	## first.
 	## Do you want the experiment to end after a certain number of trials?
 	endAfterTrials = False
-	numberOfTrials = 100
+	numberOfTrials = 1
 
 	## Do you want the experiment to end after a certain time (minutes)?
 	endAfterTime = True
