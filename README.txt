@@ -30,7 +30,21 @@ INSTALLATION
 		ARDUINO
 
 		(1) Dowload and install the Arduino IDE software to a computer of your choosing (http://arduino.cc/en/main/software)
-		(2) 
+		(2) Clone the repository for MouselabRig onto your computer (https://github.com/srofrano/MouselabRig)
+			Further information on this process can be found on github.com
+		(3) Open MouselabRig/ArduinoCode/run.ino in the Arduino IDE by double-clicking the file
+		(4) Plug the Arduino into the computer and compile/upload the program 
+		(5) The Arduino is now ready to use
+
+		RASPBERRY PI
+
+		(1) SSH into the Pi and install Pip (http://pip.readthedocs.org/en/latest/installing.html)
+		(2) Use pip to install pySerial (http://pyserial.sourceforge.net/pyserial.html#installation)
+		(3) Clone the MouselabRig repository into the home directory
+
+
+USAGE
+
 
 
 
