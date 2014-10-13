@@ -44,9 +44,26 @@ INSTALLATION
 
 
 USAGE
+	Running the system is fairly straightforward. After correct installation, simply modify parameters.py with your desired settings (consult in-file comments and section below) and run the program with the command 
 
+		pi$ python main.py
 
+	from the command line on th Pi. The program will ask you if you want to begin. Enter 'y' when ready, and the program as determined by the settings in parameters.py will begin to execute.
 
+OPERATION
+	The main program will accomplish five tasks simultaneously.
+
+	(1) Messaging - The program establishes communications with the Arduino, which monitors the state of the sensors and controls the hardware. Communication between the devices is one-to-one, in that each device sends information only after the previous message from the other device has been received. When the program is started, it sends a reset command to the Arduino. The Arduino reboots, sends the first message, and they alternate thereafter.
+
+	(2) Processing - After a message is received, the device will parse out the data and process it in real time. This means that processing occurs before new data can be received/transmitted. The Pi will take the state of the sensors and generate position data (speed, distance travelled, etc.). The Arduino will look for commands from the Pi to make some modification to hardware.
+
+	(3) Logging - The Pi will log all the data as it is processed in a txt file at a location determined in parameters.py. It logs all relevant information on a single line, to be parsed in post-processing in MATLAB.
+
+	(4) Displaying - The Pi will display the current time, position, and other relevant data on the command line. This notifys the user of the current state of the experiment.
+
+	(5) Reward testing - The Pi will constanltly check if the reward conditions have been met. When they have, the Pi will issue a command to the Arduino to open the valve for a predetermined amount of time. 
+
+	These functions are elaborated upon in the discussion below.
 
 
 METHODOLOGY
