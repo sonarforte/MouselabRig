@@ -1,7 +1,7 @@
 
 // main.ino
 // Communicates with RPi through serial data stream
-// Steven Rofrano
+// Steven John 
 // 2014-07-28
 
 

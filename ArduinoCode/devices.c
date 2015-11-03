@@ -1,6 +1,6 @@
   // devices.c
 // Defines device interface functions 
-// Steven Rofrano
+// Steven John 
 // 2014-07-28
 
 #include "devices.h"

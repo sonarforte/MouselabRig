@@ -1,6 +1,6 @@
 # parameters.py
 # contains all the settings that should be changed and confirmed before each experiment
-# Steven Rofrano
+# Steven John 
 # 2014-09-09
 
 class Cons:

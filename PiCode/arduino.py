@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # arduino.py
 # Subclasses pySerial to handle interactions with Arduino
-# Steven Rofrano
+# Steven John 
 # 2014-09-10
 
 import serial

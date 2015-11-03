@@ -1,6 +1,6 @@
 // devices.h
 // Header file for devices.c 
-// Steven Rofrano
+// Steven John 
 // 2014-07-28
 
 

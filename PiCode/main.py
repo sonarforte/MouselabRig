@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # main.py
 # Interfaces with arduino via arduinoial data stream
-# Steven Rofrano
+# Steven John 
 # 2014-07-28
 
 import time

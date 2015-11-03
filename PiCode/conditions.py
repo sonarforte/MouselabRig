@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # conditions.py
 # Defines the Experiment class for setting and implementing conditional reward system
-# Steven Rofrano
+# Steven John 
 # 2014-09-12
 
 import random

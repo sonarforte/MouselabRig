@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # data.py
 # Defines the comm class for communications with Arduino
-# Steven Rofrano
+# Steven John 
 # 2014-08-07
 
 
